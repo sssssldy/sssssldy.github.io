@@ -1,0 +1,93 @@
+[
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "sssssldy",
+    "section": "",
+    "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html",
+    "href": "posts/r-spatial-map/index.html",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "",
+    "text": "本教程展示如何使用 R 语言中最新的sf（矢量）和terra（栅格）生态链，自动匹配特定城市的空间边界与大范围的 TIF 遥感影像，并结合湖泊采样点数据，绘制学术出版级质量的城市宏观总图与局部放大细节图。\n🌟 核心亮点\n\n全自动智能化：只需修改一个城市代码开关（如 JN），后续行政边界提取、TIF 智能切片匹配全自动运行。\n坐标轴完美防重叠：通过动态计算 breaks，彻底解决 coord_sf 在小范围放大时经纬度标签重叠挤压的痛点。\n健壮性容错：内置国内常见 GIS 数据中“行政区划边界经纬度反转”的自动诊断与修复逻辑。\n\n首先，加载研究所需的核心空间分析与可视化包：\n\n# 这里写你的 R 代码\n\n\nlibrary(ggplot2)\nlibrary(sf)\nlibrary(dplyr)\nlibrary(terra)\nlibrary(tidyterra)\n\n\n# 【请在此处填入你的本地数据路径】\nchina_map   &lt;- st_read(\"D:/1work/2city/light/raw_data/行政区划/shi2022.shp\", quiet = TRUE) \nlake_data   &lt;- read.csv(\"D:/1work/2city/light/raw_data/湖泊总.csv\") \ntif_dir     &lt;- \"D:/1work/2city/light/raw_data/tif/\"\n\n# 🌟【核心切换开关】：想画哪个城市，直接改这里，后续全自动运行！\ntarget_city &lt;- \"JN\""
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#教程简介与环境配置",
+    "href": "posts/r-spatial-map/index.html#教程简介与环境配置",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "",
+    "text": "本教程展示如何使用 R 语言中最新的sf（矢量）和terra（栅格）生态链，自动匹配特定城市的空间边界与大范围的 TIF 遥感影像，并结合湖泊采样点数据，绘制学术出版级质量的城市宏观总图与局部放大细节图。\n🌟 核心亮点\n\n全自动智能化：只需修改一个城市代码开关（如 JN），后续行政边界提取、TIF 智能切片匹配全自动运行。\n坐标轴完美防重叠：通过动态计算 breaks，彻底解决 coord_sf 在小范围放大时经纬度标签重叠挤压的痛点。\n健壮性容错：内置国内常见 GIS 数据中“行政区划边界经纬度反转”的自动诊断与修复逻辑。\n\n首先，加载研究所需的核心空间分析与可视化包：\n\n# 这里写你的 R 代码\n\n\nlibrary(ggplot2)\nlibrary(sf)\nlibrary(dplyr)\nlibrary(terra)\nlibrary(tidyterra)\n\n\n# 【请在此处填入你的本地数据路径】\nchina_map   &lt;- st_read(\"D:/1work/2city/light/raw_data/行政区划/shi2022.shp\", quiet = TRUE) \nlake_data   &lt;- read.csv(\"D:/1work/2city/light/raw_data/湖泊总.csv\") \ntif_dir     &lt;- \"D:/1work/2city/light/raw_data/tif/\"\n\n# 🌟【核心切换开关】：想画哪个城市，直接改这里，后续全自动运行！\ntarget_city &lt;- \"JN\""
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#数据读取与路径配置",
+    "href": "posts/r-spatial-map/index.html#数据读取与路径配置",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "💾 2. 数据读取与路径配置",
+    "text": "💾 2. 数据读取与路径配置\n⚠️ 读者注：请根据你本地电脑的实际存放路径修改以下变量。\n\n# 【请在此处填入你的本地数据路径】\nchina_map   &lt;- st_read(\"D:/1work/2city/light/raw_data/行政区划/shi2022.shp\", quiet = TRUE) \nlake_data   &lt;- read.csv(\"D:/1work/2city/light/raw_data/湖泊总.csv\") \ntif_dir     &lt;- \"D:/1work/2city/light/raw_data/tif/\"\n\n# 🌟【核心切换开关】：想画哪个城市，直接改这里，后续全自动运行！\ntarget_city &lt;- \"JN\""
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#数据清洗与因子顺序锁定",
+    "href": "posts/r-spatial-map/index.html#数据清洗与因子顺序锁定",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "🧹 3. 数据清洗与因子顺序锁定",
+    "text": "🧹 3. 数据清洗与因子顺序锁定\n为了保证地图上图例的学术规范性（例如按城镇化强度从高到低：H -&gt; M -&gt; L 排序），我们需要对非结构化的属性数据进行因子化（Factor）处理，并将所有矢量统一转换至全球通用的 WGS84 (EPSG:4326) 经纬度投影。\n\n# 统一转换为经纬度投影\nchina_map_4326 &lt;- st_transform(china_map, crs = 4326)\n\n# 动态过滤并显式锁定图例显示顺序：city_H -&gt; city_M -&gt; city_L\ndf_current &lt;- lake_data %&gt;% \n  filter(City_Name == target_city) %&gt;% \n  mutate(City_Group = factor(City_Group, levels = c(\"city_H\", \"city_M\", \"city_L\")))\n\n# 转换为 sf 空间矢量对象\ndf_current_sf &lt;- st_as_sf(df_current, coords = c(\"Centroid_X\", \"Centroid_Y\"), crs = 4326)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#行政边界智能合成与经纬度反转诊断",
+    "href": "posts/r-spatial-map/index.html#行政边界智能合成与经纬度反转诊断",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "🤖 4. 行政边界智能合成与经纬度反转诊断",
+    "text": "🤖 4. 行政边界智能合成与经纬度反转诊断\n在处理国内部分来源不明的 Shapefile 时，经常会遇到经纬度颠倒（X/Y 错位）导致画图移到北极或南极的问题。本段代码实现了自动盲检与拨乱反正。\n\n# 自动寻找并合并当前城市的完整“区划轮廓模具”\ncurrent_boundary &lt;- china_map_4326[st_intersects(china_map_4326, df_current_sf, sparse = FALSE) %&gt;% rowSums() &gt; 0, ] %&gt;% \n  st_union()\n\n# 自动诊断当前城市的 shp 边界是否存在【经纬度颠倒】问题\nbbox_check &lt;- st_bbox(current_boundary)\nif (mean(c(bbox_check[[\"xmin\"]], bbox_check[[\"xmax\"]])) &lt; mean(c(bbox_check[[\"ymin\"]], bbox_check[[\"ymax\"]]))) {\n  cat(\"⚠️ 警告：检测到当前城市 administrative shp 存在经纬度反转问题，正在全自动拨乱反正...\\n\")\n  current_boundary &lt;- st_flip_coordinates(current_boundary)\n}\n\n# 确保转换为标准的 terra 矢量对象\ncity_vector_4326 &lt;- vect(current_boundary)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#大范围-tif-栅格数据的智能裁剪与有效性匹配",
+    "href": "posts/r-spatial-map/index.html#大范围-tif-栅格数据的智能裁剪与有效性匹配",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "🔍 5. 大范围 TIF 栅格数据的“智能裁剪与有效性匹配”",
+    "text": "🔍 5. 大范围 TIF 栅格数据的“智能裁剪与有效性匹配”\n当面对海量分块的遥感 TIF 影像（如城市化权重数据）时，盲目合并极度消耗内存。\n本算法的逻辑是：先盲检几何外框是否相交 ➡️ 再执行空间试切 ➡️ 统计切出区域内是否有非 NA 的有效像素。 只有真正提供数据的 TIF 块才会被加载。\n\ntif_files   &lt;- list.files(tif_dir, pattern = \"\\\\.tif$\", full.names = TRUE)\nraster_list &lt;- lapply(tif_files, rast)\n\nselected_raster_4326 &lt;- NULL\n\nfor (i in seq_along(raster_list)) {\n  r &lt;- raster_list[[i]]\n  r_4326 &lt;- project(r, \"EPSG:4326\", method = \"near\")\n  \n  # 步骤 A：几何外框相交检测\n  is_intersected &lt;- is.related(ext(r_4326), city_vector_4326, \"intersects\")\n  \n  if (is_intersected) {\n    # 步骤 B：试切并检查空值\n    test_crop &lt;- crop(r_4326, city_vector_4326)\n    valid_pixels &lt;- sum(!is.na(values(test_crop)))\n    \n    if (valid_pixels &gt; 0) {\n      selected_raster_4326 &lt;- r_4326\n      cat(paste0(\"📊 智能匹配成功！\", target_city, \" 在第 \", i, \" 个 TIF 中找到了 \", valid_pixels, \" 个有效城镇化像素。\\n\"))\n      break\n    } else {\n      cat(paste0(\"ℹ️ 提示：第 \", i, \" 个 TIF 虽然几何相交，但在 \", target_city, \" 范围内全是空白(NA)，自动跳过...\\n\"))\n    }\n  }\n}\n\nℹ️ 提示：第 3 个 TIF 虽然几何相交，但在 JN 范围内全是空白(NA)，自动跳过...\n📊 智能匹配成功！JN 在第 4 个 TIF 中找到了 63484 个有效城镇化像素。\n\nif (is.null(selected_raster_4326)) {\n  stop(\"❌ 错误：在所有 TIF 文件夹中，都没有找到能在该城市范围内提供【有效像素值】的影像！\")\n}"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#动态范围计算与安全空间裁剪",
+    "href": "posts/r-spatial-map/index.html#动态范围计算与安全空间裁剪",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "📐 6. 动态范围计算与安全空间裁剪",
+    "text": "📐 6. 动态范围计算与安全空间裁剪\n为了生成“总图”和“放大细节图”两个不同的视角，我们需要动态计算各自的边界框（Bounding Box），并扩展一定的缓冲空间（Padding）防止切边\n\n# 1. 动态计算【局部放大】的经纬度边界框\nbbox_points &lt;- st_bbox(df_current_sf)\nx_point_padding &lt;- (bbox_points[[\"xmax\"]] - bbox_points[[\"xmin\"]]) * 0.1\ny_point_padding &lt;- (bbox_points[[\"ymax\"]] - bbox_points[[\"ymin\"]]) * 0.1\n\nlocal_xlim &lt;- c(bbox_points[[\"xmin\"]] - x_point_padding, bbox_points[[\"xmax\"]] + x_point_padding)\nlocal_ylim &lt;- c(bbox_points[[\"ymin\"]] - y_point_padding, bbox_points[[\"ymax\"]] + y_point_padding)\nlocal_extent_4326 &lt;- ext(local_xlim[1], local_xlim[2], local_ylim[1], local_ylim[2])\n\n# 2. 动态计算【总图锁定】的经纬度边界\nbbox_city &lt;- st_bbox(current_boundary)\nx_city_padding &lt;- (bbox_city[[\"xmax\"]] - bbox_city[[\"xmin\"]]) * 0.05\ny_city_padding &lt;- (bbox_city[[\"ymax\"]] - bbox_city[[\"ymin\"]]) * 0.05\n\ncity_xlim &lt;- c(bbox_city[[\"xmin\"]] - x_city_padding, bbox_city[[\"xmax\"]] + x_city_padding)\ncity_ylim &lt;- c(bbox_city[[\"ymin\"]] - y_city_padding, bbox_city[[\"ymax\"]] + y_city_padding)\n\n# --- 执行安全裁剪与后处理 ---\nsmod_macro_cropped &lt;- crop(selected_raster_4326, city_vector_4326)\nsmod_local_cropped &lt;- crop(selected_raster_4326, local_extent_4326)\n\nsmod_macro_smooth &lt;- resample(smod_macro_cropped, smod_macro_cropped, method = \"bilinear\")\nnames(smod_macro_smooth) &lt;- \"SMOD_Value\"\nsmod_macro_masked &lt;- mask(smod_macro_smooth, city_vector_4326)\n\nnames(smod_local_cropped) &lt;- \"SMOD_Class\"\nsmod_local_4326 &lt;- suppressWarnings(as.factor(smod_local_cropped))\n\ngray_colors &lt;- c(\n  \"11\" = \"#F0F0F0\", \"12\" = \"#E0E0E0\", \"13\" = \"#D0D0D0\", \n  \"21\" = \"#B8B8B8\", \"22\" = \"#A0A0A0\", \"23\" = \"#888888\", \n  \"30\" = \"#686868\", \"NA\" = \"transparent\"\n)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#高级学术绘图展现",
+    "href": "posts/r-spatial-map/index.html#高级学术绘图展现",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "🎨 7. 高级学术绘图展现",
+    "text": "🎨 7. 高级学术绘图展现\n\n🗺️ 绘图 1：宏观总图 (多城市自适应版)\n该版本核心在于通过 seq(…, length.out = 4) 控制无论城市大或小，横纵轴都只精简地产生 4 个刻度，并配合 °E / °N 后缀，达到国际期刊发表标准。\n\n#1. 🌟【核心算法】：无论城市大小，横纵轴都只雷打不动地切出 4 个均匀的刻度位置\nx_breaks_nc &lt;- seq(from = city_xlim[1], to = city_xlim[2], length.out = 4)\ny_breaks_nc &lt;- seq(from = city_ylim[1], to = city_ylim[2], length.out = 4)\n\n# 2. 动态格式化标签：保留 1 位小数，并优雅地贴上地理方位后缀\nx_labels_nc &lt;- paste0(sprintf(\"%.1f\", x_breaks_nc), \"°E\")\ny_labels_nc &lt;- paste0(sprintf(\"%.1f\", y_breaks_nc), \"°N\")\n\n# 3. 开始标准学术绘图\nggplot() +\n  # 渲染城市内部显示的平滑栅格\n  geom_spatraster(data = smod_macro_masked, maxcell = Inf, alpha = 0.75) +\n  scale_fill_gradient(low = \"#F5F5F5\", high = \"#505050\",\n                      name = \"GHS_SMOD\", na.value = \"transparent\") +\n  \n  # 叠加黑色高亮当前城市的行政轮廓边界与背景底图\n  geom_sf(data = current_boundary, fill = NA, color = \"black\", linewidth = 0.8) +\n  geom_sf(data = china_map_4326, fill = NA, color = \"gray60\", linewidth = 0.4) +\n  \n  # 叠加采样点\n  geom_point(data = df_current, aes(x = Centroid_X, y = Centroid_Y, color = City_Group),\n             size = 3.5, alpha = 0.95) +\n  \n  # ✨ 干净回归：coord_sf 只做裁剪，不掺杂任何破坏轴标签的过时参数\n  coord_sf(xlim = city_xlim, ylim = city_ylim, crs = 4326) +\n  \n  # ✨【核心控框】：把算好的南昌风格稀疏刻度和标签强行注入坐标轴\n  scale_x_continuous(breaks = x_breaks_nc, labels = x_labels_nc) +\n  scale_y_continuous(breaks = y_breaks_nc, labels = y_labels_nc) +\n  \n  # 颜色与图例顺序美化\n  scale_color_manual(\n    values = c(\"city_H\" = \"#E41A1C\", \"city_M\" = \"#377EB8\", \"city_L\" = \"#4DAF4A\"),\n    name = \"Urbanization intensity\"\n  ) +\n  theme_bw() +\n  labs(\n    title = paste(target_city, \"Sampling Lakes\"),\n    x = \"Longitude\", y = \"Latitude\"  # 严格修正：X轴是经度，Y轴是纬度\n  ) +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 14),\n    panel.grid.major = element_line(color = \"gray92\", linewidth = 0.3),\n    panel.grid.minor = element_blank(), # 关掉次要网格线，画面更高级\n    legend.position = \"right\",\n    \n    # ✨【视觉瘦身】：文字保持完美的水平正向(angle=0)，通过字号(9)和刻度总数控制，绝对不会重叠\n    axis.text.x = element_text(size = 9, color = \"black\"),\n    axis.text.y = element_text(size = 9, color = \"black\"),\n    axis.ticks = element_line(color = \"black\", linewidth = 0.4)\n  )\n\n\n\n\n\n\n\n\n\n\n🔍 绘图 2：局部放大图 (完美不重叠标准版)\n在放大到高精度的局部尺度时，传统的自动坐标轴极易发生重叠混乱。我们通过在 scale_*_continuous 中使用 by = 0.05 手动控制步长间隔，完美避开字体挤压问题\n\nggplot() +\n  geom_spatraster(data = smod_local_4326, maxcell = Inf, alpha = 0.5) +\n  scale_fill_manual(values = gray_colors, name = \"GHS_SMOD\", na.value = \"transparent\") +\n  geom_sf(data = china_map_4326, fill = NA, color = \"white\", linewidth = 0.6) +\n  geom_point(data = df_current, aes(x = Centroid_X, y = Centroid_Y, color = City_Group),\n             size = 4.5, alpha = 0.95) +\n  coord_sf(xlim = local_xlim, ylim = local_ylim, crs = 4326) +\n  scale_x_continuous(\n    breaks = seq(from = round(local_xlim[1], 2), to = round(local_xlim[2], 2), by = 0.05)\n  ) +\n  scale_y_continuous(\n    breaks = seq(from = round(local_ylim[1], 2), to = round(local_ylim[2], 2), by = 0.03)\n  ) +\n  scale_color_manual(\n    values = c(\"city_H\" = \"#E41A1C\", \"city_M\" = \"#377EB8\", \"city_L\" = \"#4DAF4A\"),\n    name = \"Urbanization intensity\"\n  ) +\n  theme_bw() +\n  labs(\n    title = paste(target_city, \"Sampling Lakes (Local View)\"),\n    x = \"Longitude (°E)\",\n    y = \"Latitude (°N)\"\n  ) +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 14),\n    panel.grid.major = element_line(color = \"gray90\", linewidth = 0.3),\n    legend.position = \"right\",\n    axis.text.x = element_text(size = 9),\n    axis.text.y = element_text(size = 9)\n  )"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.html#结语与讨论",
+    "href": "posts/r-spatial-map/index.html#结语与讨论",
+    "title": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程",
+    "section": "🏁 8. 结语与讨论",
+    "text": "🏁 8. 结语与讨论\n通过这种基于 bbox 动态范围缩放与局部像素有效性匹配的方案，你可以放心地将顶部的 target_city 更改为任何你数据集里拥有的城市代码（例如从 “JN” 改为 “NC”），代码将会自动解构、匹配并生成对应的高质量规范地图。"
+  }
+]

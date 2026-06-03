@@ -1,0 +1,1447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>sssssldy</title>
+<link>https://your-website-url.example.com/</link>
+<atom:link href="https://your-website-url.example.com/index.xml" rel="self" type="application/rss+xml"/>
+<description>A blog built with Quarto</description>
+<generator>quarto-1.9.36</generator>
+<lastBuildDate>Tue, 02 Jun 2026 16:00:00 GMT</lastBuildDate>
+<item>
+  <title>Post With Code</title>
+  <dc:creator>Harlow Malloc</dc:creator>
+  <link>https://your-website-url.example.com/posts/post-with-code/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This is a post with executable code.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+
+
+
+ ]]></description>
+  <category>news</category>
+  <category>code</category>
+  <category>analysis</category>
+  <guid>https://your-website-url.example.com/posts/post-with-code/</guid>
+  <pubDate>Tue, 02 Jun 2026 16:00:00 GMT</pubDate>
+  <media:content url="https://your-website-url.example.com/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Welcome To My Blog</title>
+  <dc:creator>Tristan O&#39;Malley</dc:creator>
+  <link>https://your-website-url.example.com/posts/welcome/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This is the first post in a Quarto blog. Welcome!</p>
+<p><img src="https://your-website-url.example.com/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
+<p>Since this post doesn’t specify an explicit <code>image</code>, the first image in the post will be used in the listing page of posts.</p>
+
+
+
+ ]]></description>
+  <category>news</category>
+  <guid>https://your-website-url.example.com/posts/welcome/</guid>
+  <pubDate>Sat, 30 May 2026 16:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程</title>
+  <link>https://your-website-url.example.com/posts/r-spatial-map/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="教程简介与环境配置" class="level2">
+<h2 class="anchored" data-anchor-id="教程简介与环境配置">📌 1. 教程简介与环境配置</h2>
+<p>本教程展示如何使用 R 语言中最新的sf（矢量）和terra（栅格）生态链，自动匹配特定城市的空间边界与大范围的 TIF 遥感影像，并结合湖泊采样点数据，绘制学术出版级质量的城市宏观总图与局部放大细节图。</p>
+<p>🌟 <strong>核心亮点</strong></p>
+<ul>
+<li>全自动智能化：只需修改一个城市代码开关（如 <code>JN</code>），后续行政边界提取、TIF 智能切片匹配全自动运行。</li>
+<li>坐标轴完美防重叠：通过动态计算 <code>breaks</code>，彻底解决 <code>coord_sf</code> 在小范围放大时经纬度标签重叠挤压的痛点。</li>
+<li>健壮性容错：内置国内常见 GIS 数据中“行政区划边界经纬度反转”的自动诊断与修复逻辑。</li>
+</ul>
+<p>首先，加载研究所需的核心空间分析与可视化包：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 这里写你的 R 代码</span></span>
+<span id="cb1-2"></span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf)</span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(terra)</span>
+<span id="cb1-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidyterra)</span></code></pre></div></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 【请在此处填入你的本地数据路径】</span></span>
+<span id="cb2-2">china_map   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_read</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/行政区划/shi2022.shp"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">quiet =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) </span>
+<span id="cb2-3">lake_data   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read.csv</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/湖泊总.csv"</span>) </span>
+<span id="cb2-4">tif_dir     <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/tif/"</span></span>
+<span id="cb2-5"></span>
+<span id="cb2-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 🌟【核心切换开关】：想画哪个城市，直接改这里，后续全自动运行！</span></span>
+<span id="cb2-7">target_city <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"JN"</span></span></code></pre></div></div>
+</div>
+</section>
+<section id="数据读取与路径配置" class="level2">
+<h2 class="anchored" data-anchor-id="数据读取与路径配置">💾 2. 数据读取与路径配置</h2>
+<p>⚠️ 读者注：请根据你本地电脑的实际存放路径修改以下变量。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 【请在此处填入你的本地数据路径】</span></span>
+<span id="cb3-2">china_map   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_read</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/行政区划/shi2022.shp"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">quiet =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) </span>
+<span id="cb3-3">lake_data   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read.csv</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/湖泊总.csv"</span>) </span>
+<span id="cb3-4">tif_dir     <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/tif/"</span></span>
+<span id="cb3-5"></span>
+<span id="cb3-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 🌟【核心切换开关】：想画哪个城市，直接改这里，后续全自动运行！</span></span>
+<span id="cb3-7">target_city <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"JN"</span></span></code></pre></div></div>
+</div>
+</section>
+<section id="数据清洗与因子顺序锁定" class="level2">
+<h2 class="anchored" data-anchor-id="数据清洗与因子顺序锁定">🧹 3. 数据清洗与因子顺序锁定</h2>
+<p>为了保证地图上图例的学术规范性（例如按城镇化强度从高到低：H -&gt; M -&gt; L 排序），我们需要对非结构化的属性数据进行因子化（Factor）处理，并将所有矢量统一转换至全球通用的 WGS84 (EPSG:4326) 经纬度投影。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 统一转换为经纬度投影</span></span>
+<span id="cb4-2">china_map_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(china_map, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span>
+<span id="cb4-3"></span>
+<span id="cb4-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 动态过滤并显式锁定图例显示顺序：city_H -&gt; city_M -&gt; city_L</span></span>
+<span id="cb4-5">df_current <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> lake_data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb4-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(City_Name <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> target_city) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb4-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">City_Group =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(City_Group, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_H"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_M"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_L"</span>)))</span>
+<span id="cb4-8"></span>
+<span id="cb4-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 转换为 sf 空间矢量对象</span></span>
+<span id="cb4-10">df_current_sf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sf</span>(df_current, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Centroid_X"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Centroid_Y"</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span></code></pre></div></div>
+</div>
+</section>
+<section id="行政边界智能合成与经纬度反转诊断" class="level2">
+<h2 class="anchored" data-anchor-id="行政边界智能合成与经纬度反转诊断">🤖 4. 行政边界智能合成与经纬度反转诊断</h2>
+<p>在处理国内部分来源不明的 Shapefile 时，经常会遇到经纬度颠倒（X/Y 错位）导致画图移到北极或南极的问题。本段代码实现了自动盲检与拨乱反正。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 自动寻找并合并当前城市的完整“区划轮廓模具”</span></span>
+<span id="cb5-2">current_boundary <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> china_map_4326[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_intersects</span>(china_map_4326, df_current_sf, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sparse =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rowSums</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb5-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_union</span>()</span>
+<span id="cb5-4"></span>
+<span id="cb5-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 自动诊断当前城市的 shp 边界是否存在【经纬度颠倒】问题</span></span>
+<span id="cb5-6">bbox_check <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(current_boundary)</span>
+<span id="cb5-7"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]], bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]])) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]], bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]]))) {</span>
+<span id="cb5-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"⚠️ 警告：检测到当前城市 administrative shp 存在经纬度反转问题，正在全自动拨乱反正...</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb5-9">  current_boundary <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_flip_coordinates</span>(current_boundary)</span>
+<span id="cb5-10">}</span>
+<span id="cb5-11"></span>
+<span id="cb5-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 确保转换为标准的 terra 矢量对象</span></span>
+<span id="cb5-13">city_vector_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vect</span>(current_boundary)</span></code></pre></div></div>
+</div>
+</section>
+<section id="大范围-tif-栅格数据的智能裁剪与有效性匹配" class="level2">
+<h2 class="anchored" data-anchor-id="大范围-tif-栅格数据的智能裁剪与有效性匹配">🔍 5. 大范围 TIF 栅格数据的“智能裁剪与有效性匹配”</h2>
+<p>当面对海量分块的遥感 TIF 影像（如城市化权重数据）时，盲目合并极度消耗内存。</p>
+<p>本算法的逻辑是：先盲检几何外框是否相交 ➡️ 再执行空间试切 ➡️ 统计切出区域内是否有非 NA 的有效像素。 只有真正提供数据的 TIF 块才会被加载。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">tif_files   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list.files</span>(tif_dir, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\\</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">.tif$"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full.names =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb6-2">raster_list <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(tif_files, rast)</span>
+<span id="cb6-3"></span>
+<span id="cb6-4">selected_raster_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span></span>
+<span id="cb6-5"></span>
+<span id="cb6-6"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_along</span>(raster_list)) {</span>
+<span id="cb6-7">  r <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> raster_list[[i]]</span>
+<span id="cb6-8">  r_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">project</span>(r, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"EPSG:4326"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"near"</span>)</span>
+<span id="cb6-9">  </span>
+<span id="cb6-10">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 步骤 A：几何外框相交检测</span></span>
+<span id="cb6-11">  is_intersected <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.related</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ext</span>(r_4326), city_vector_4326, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"intersects"</span>)</span>
+<span id="cb6-12">  </span>
+<span id="cb6-13">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (is_intersected) {</span>
+<span id="cb6-14">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 步骤 B：试切并检查空值</span></span>
+<span id="cb6-15">    test_crop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(r_4326, city_vector_4326)</span>
+<span id="cb6-16">    valid_pixels <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">values</span>(test_crop)))</span>
+<span id="cb6-17">    </span>
+<span id="cb6-18">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (valid_pixels <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>) {</span>
+<span id="cb6-19">      selected_raster_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> r_4326</span>
+<span id="cb6-20">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"📊 智能匹配成功！"</span>, target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" 在第 "</span>, i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" 个 TIF 中找到了 "</span>, valid_pixels, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" 个有效城镇化像素。</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>))</span>
+<span id="cb6-21">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">break</span></span>
+<span id="cb6-22">    } <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> {</span>
+<span id="cb6-23">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ℹ️ 提示：第 "</span>, i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" 个 TIF 虽然几何相交，但在 "</span>, target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" 范围内全是空白(NA)，自动跳过...</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>))</span>
+<span id="cb6-24">    }</span>
+<span id="cb6-25">  }</span>
+<span id="cb6-26">}</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ℹ️ 提示：第 3 个 TIF 虽然几何相交，但在 JN 范围内全是空白(NA)，自动跳过...
+📊 智能匹配成功！JN 在第 4 个 TIF 中找到了 63484 个有效城镇化像素。</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.null</span>(selected_raster_4326)) {</span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"❌ 错误：在所有 TIF 文件夹中，都没有找到能在该城市范围内提供【有效像素值】的影像！"</span>)</span>
+<span id="cb8-3">}</span></code></pre></div></div>
+</div>
+</section>
+<section id="动态范围计算与安全空间裁剪" class="level2">
+<h2 class="anchored" data-anchor-id="动态范围计算与安全空间裁剪">📐 6. 动态范围计算与安全空间裁剪</h2>
+<p>为了生成“总图”和“放大细节图”两个不同的视角，我们需要动态计算各自的边界框（Bounding Box），并扩展一定的缓冲空间（Padding）防止切边</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 1. 动态计算【局部放大】的经纬度边界框</span></span>
+<span id="cb9-2">bbox_points <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(df_current_sf)</span>
+<span id="cb9-3">x_point_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span></span>
+<span id="cb9-4">y_point_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span></span>
+<span id="cb9-5"></span>
+<span id="cb9-6">local_xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> x_point_padding, bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_point_padding)</span>
+<span id="cb9-7">local_ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> y_point_padding, bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> y_point_padding)</span>
+<span id="cb9-8">local_extent_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ext</span>(local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span>
+<span id="cb9-9"></span>
+<span id="cb9-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2. 动态计算【总图锁定】的经纬度边界</span></span>
+<span id="cb9-11">bbox_city <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(current_boundary)</span>
+<span id="cb9-12">x_city_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span></span>
+<span id="cb9-13">y_city_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span></span>
+<span id="cb9-14"></span>
+<span id="cb9-15">city_xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> x_city_padding, bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_city_padding)</span>
+<span id="cb9-16">city_ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> y_city_padding, bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> y_city_padding)</span>
+<span id="cb9-17"></span>
+<span id="cb9-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># --- 执行安全裁剪与后处理 ---</span></span>
+<span id="cb9-19">smod_macro_cropped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(selected_raster_4326, city_vector_4326)</span>
+<span id="cb9-20">smod_local_cropped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(selected_raster_4326, local_extent_4326)</span>
+<span id="cb9-21"></span>
+<span id="cb9-22">smod_macro_smooth <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">resample</span>(smod_macro_cropped, smod_macro_cropped, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bilinear"</span>)</span>
+<span id="cb9-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(smod_macro_smooth) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SMOD_Value"</span></span>
+<span id="cb9-24">smod_macro_masked <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mask</span>(smod_macro_smooth, city_vector_4326)</span>
+<span id="cb9-25"></span>
+<span id="cb9-26"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(smod_local_cropped) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SMOD_Class"</span></span>
+<span id="cb9-27">smod_local_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">suppressWarnings</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.factor</span>(smod_local_cropped))</span>
+<span id="cb9-28"></span>
+<span id="cb9-29">gray_colors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb9-30">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"11"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#F0F0F0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"12"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#E0E0E0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"13"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D0D0D0"</span>, </span>
+<span id="cb9-31">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"21"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#B8B8B8"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"22"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#A0A0A0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"23"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#888888"</span>, </span>
+<span id="cb9-32">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"30"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#686868"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NA"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"transparent"</span></span>
+<span id="cb9-33">)</span></code></pre></div></div>
+</div>
+</section>
+<section id="高级学术绘图展现" class="level2">
+<h2 class="anchored" data-anchor-id="高级学术绘图展现">🎨 7. 高级学术绘图展现</h2>
+<section id="绘图-1宏观总图-多城市自适应版" class="level3">
+<h3 class="anchored" data-anchor-id="绘图-1宏观总图-多城市自适应版">🗺️ 绘图 1：宏观总图 (多城市自适应版)</h3>
+<p>该版本核心在于通过 seq(…, length.out = 4) 控制无论城市大或小，横纵轴都只精简地产生 4 个刻度，并配合 °E / °N 后缀，达到国际期刊发表标准。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#1. 🌟【核心算法】：无论城市大小，横纵轴都只雷打不动地切出 4 个均匀的刻度位置</span></span>
+<span id="cb10-2">x_breaks_nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> city_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> city_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">length.out =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb10-3">y_breaks_nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> city_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> city_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">length.out =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb10-4"></span>
+<span id="cb10-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2. 动态格式化标签：保留 1 位小数，并优雅地贴上地理方位后缀</span></span>
+<span id="cb10-6">x_labels_nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sprintf</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"%.1f"</span>, x_breaks_nc), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"°E"</span>)</span>
+<span id="cb10-7">y_labels_nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sprintf</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"%.1f"</span>, y_breaks_nc), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"°N"</span>)</span>
+<span id="cb10-8"></span>
+<span id="cb10-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 3. 开始标准学术绘图</span></span>
+<span id="cb10-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-11">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 渲染城市内部显示的平滑栅格</span></span>
+<span id="cb10-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_spatraster</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> smod_macro_masked, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">maxcell =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">Inf</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.75</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_gradient</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">low =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#F5F5F5"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">high =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#505050"</span>,</span>
+<span id="cb10-14">                      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"GHS_SMOD"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.value =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"transparent"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-15">  </span>
+<span id="cb10-16">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 叠加黑色高亮当前城市的行政轮廓边界与背景底图</span></span>
+<span id="cb10-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> current_boundary, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> china_map_4326, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"gray60"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.4</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-19">  </span>
+<span id="cb10-20">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 叠加采样点</span></span>
+<span id="cb10-21">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> df_current, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> Centroid_X, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> Centroid_Y, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> City_Group),</span>
+<span id="cb10-22">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.5</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-23">  </span>
+<span id="cb10-24">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ✨ 干净回归：coord_sf 只做裁剪，不掺杂任何破坏轴标签的过时参数</span></span>
+<span id="cb10-25">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> city_xlim, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylim =</span> city_ylim, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-26">  </span>
+<span id="cb10-27">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ✨【核心控框】：把算好的南昌风格稀疏刻度和标签强行注入坐标轴</span></span>
+<span id="cb10-28">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> x_breaks_nc, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">labels =</span> x_labels_nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-29">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> y_breaks_nc, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">labels =</span> y_labels_nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-30">  </span>
+<span id="cb10-31">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 颜色与图例顺序美化</span></span>
+<span id="cb10-32">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_color_manual</span>(</span>
+<span id="cb10-33">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_H"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#E41A1C"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_M"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#377EB8"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_L"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#4DAF4A"</span>),</span>
+<span id="cb10-34">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Urbanization intensity"</span></span>
+<span id="cb10-35">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-36">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-37">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(</span>
+<span id="cb10-38">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste</span>(target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Sampling Lakes"</span>),</span>
+<span id="cb10-39">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Longitude"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Latitude"</span>  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 严格修正：X轴是经度，Y轴是纬度</span></span>
+<span id="cb10-40">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-41">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(</span>
+<span id="cb10-42">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">14</span>),</span>
+<span id="cb10-43">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">panel.grid.major =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"gray92"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>),</span>
+<span id="cb10-44">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">panel.grid.minor =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_blank</span>(), <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 关掉次要网格线，画面更高级</span></span>
+<span id="cb10-45">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.position =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"right"</span>,</span>
+<span id="cb10-46">    </span>
+<span id="cb10-47">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ✨【视觉瘦身】：文字保持完美的水平正向(angle=0)，通过字号(9)和刻度总数控制，绝对不会重叠</span></span>
+<span id="cb10-48">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>),</span>
+<span id="cb10-49">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>),</span>
+<span id="cb10-50">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.ticks =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.4</span>)</span>
+<span id="cb10-51">  )</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/posts/r-spatial-map/images/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="绘图-2局部放大图-完美不重叠标准版" class="level3">
+<h3 class="anchored" data-anchor-id="绘图-2局部放大图-完美不重叠标准版">🔍 绘图 2：局部放大图 (完美不重叠标准版)</h3>
+<p>在放大到高精度的局部尺度时，传统的自动坐标轴极易发生重叠混乱。我们通过在 scale_*_continuous 中使用 by = 0.05 手动控制步长间隔，完美避开字体挤压问题</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_spatraster</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> smod_local_4326, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">maxcell =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">Inf</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> gray_colors, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"GHS_SMOD"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.value =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"transparent"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> china_map_4326, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"white"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> df_current, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> Centroid_X, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> Centroid_Y, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> City_Group),</span>
+<span id="cb11-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.5</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> local_xlim, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylim =</span> local_ylim, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(</span>
+<span id="cb11-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>)</span>
+<span id="cb11-10">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(</span>
+<span id="cb11-12">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.03</span>)</span>
+<span id="cb11-13">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_color_manual</span>(</span>
+<span id="cb11-15">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_H"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#E41A1C"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_M"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#377EB8"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_L"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#4DAF4A"</span>),</span>
+<span id="cb11-16">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Urbanization intensity"</span></span>
+<span id="cb11-17">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(</span>
+<span id="cb11-20">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste</span>(target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Sampling Lakes (Local View)"</span>),</span>
+<span id="cb11-21">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Longitude (°E)"</span>,</span>
+<span id="cb11-22">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Latitude (°N)"</span></span>
+<span id="cb11-23">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb11-24">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(</span>
+<span id="cb11-25">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">14</span>),</span>
+<span id="cb11-26">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">panel.grid.major =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"gray90"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>),</span>
+<span id="cb11-27">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.position =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"right"</span>,</span>
+<span id="cb11-28">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>),</span>
+<span id="cb11-29">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>)</span>
+<span id="cb11-30">  )</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/posts/r-spatial-map/images/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="结语与讨论" class="level2">
+<h2 class="anchored" data-anchor-id="结语与讨论">🏁 8. 结语与讨论</h2>
+<p>通过这种基于 bbox 动态范围缩放与局部像素有效性匹配的方案，你可以放心地将顶部的 target_city 更改为任何你数据集里拥有的城市代码（例如从 “JN” 改为 “NC”），代码将会自动解构、匹配并生成对应的高质量规范地图。</p>
+
+
+</section>
+
+ ]]></description>
+  <guid>https://your-website-url.example.com/posts/r-spatial-map/</guid>
+  <pubDate>Wed, 03 Jun 2026 14:04:57 GMT</pubDate>
+</item>
+</channel>
+</rss>
