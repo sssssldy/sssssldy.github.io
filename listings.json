@@ -1,5 +1,9 @@
 [
   {
+    "listing": "/gallery/index.html",
+    "items": []
+  },
+  {
     "listing": "/index.html",
     "items": [
       "/posts/r-spatial-map/index.html",
