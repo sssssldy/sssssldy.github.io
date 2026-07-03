@@ -46,6 +46,690 @@ font-style: inherit;">1</span></span></code></pre></div></div>
   <media:content url="https://your-website-url.example.com/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
+  <title>R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points</title>
+  <dc:creator>sssssldy </dc:creator>
+  <link>https://your-website-url.example.com/posts/r-spatial-map/index.en.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction-and-environment-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-and-environment-configuration">📌 1. Introduction and Environment Configuration</h2>
+<p>This tutorial demonstrates how to leverage the latest <code>sf</code> (vector) and <code>terra</code> (raster) ecosystem in R to automatically match specific urban administrative boundaries with large-scale remote sensing TIF imagery. Combined with lake sampling point data, we will render publication-quality macro city overviews and localized detailed inset maps.</p>
+<p>🌟 <strong>Core Highlights</strong></p>
+<ul>
+<li><strong>Full Automation &amp; Intelligence</strong>: Simply modify a single city code switch (e.g., <code>JN</code>), and the subsequent administrative boundary extraction and TIF tile matching will execute fully automatically.</li>
+<li><strong>Overlap-Free Coordinate Axes</strong>: By dynamically computing <code>breaks</code>, this workflow thoroughly resolves the common pain point of overlapping longitude/latitude labels when using <code>coord_sf</code> at zoomed-in local scales.</li>
+<li><strong>Robust Fault Tolerance</strong>: Features a built-in diagnostic and correction logic to handle coordinate flipping (reversed latitude/longitude) often found in open-source spatial datasets.</li>
+</ul>
+<p>First, load the core spatial analysis and visualization packages required for this workflow:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(terra)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidyterra)</span></code></pre></div></div>
+</div>
+</section>
+<section id="data-loading-and-path-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="data-loading-and-path-configuration">💾 2. Data Loading and Path Configuration</h2>
+<p>⚠️ <strong>Note</strong>: Please modify the following variables according to your local file paths.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># [Please enter your local data paths here]</span></span>
+<span id="cb2-2">china_map   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_read</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/行政区划/shi2022.shp"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">quiet =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) </span>
+<span id="cb2-3">lake_data   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read.csv</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/湖泊总.csv"</span>) </span>
+<span id="cb2-4">tif_dir     <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"D:/1work/2city/light/raw_data/tif/"</span></span>
+<span id="cb2-5"></span>
+<span id="cb2-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 🌟 [Core Toggle Switch]: Change this to whichever city you want to map, and the rest runs automatically!</span></span>
+<span id="cb2-7">target_city <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"JN"</span></span></code></pre></div></div>
+</div>
+</section>
+<section id="data-cleaning-and-factor-order-locking" class="level2">
+<h2 class="anchored" data-anchor-id="data-cleaning-and-factor-order-locking">🧹 3. Data Cleaning and Factor Order Locking</h2>
+<p>To ensure academic compliance and standard formatting of the map legend (e.g., sorting urbanization intensity from high to low: H -&gt; M -&gt; L), we need to factorize the unstructured attribute data and project all vectors into the globally standard WGS84 geographic coordinate system (EPSG:4326).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Uniformly transform to WGS84 geographic coordinate system</span></span>
+<span id="cb3-2">china_map_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(china_map, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span>
+<span id="cb3-3"></span>
+<span id="cb3-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Dynamically filter and explicitly lock the legend display order: city_H -&gt; city_M -&gt; city_L</span></span>
+<span id="cb3-5">df_current <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> lake_data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb3-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(City_Name <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> target_city) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb3-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">City_Group =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(City_Group, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_H"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_M"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"city_L"</span>)))</span>
+<span id="cb3-8"></span>
+<span id="cb3-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Convert to an sf spatial vector object</span></span>
+<span id="cb3-10">df_current_sf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sf</span>(df_current, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Centroid_X"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Centroid_Y"</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span></code></pre></div></div>
+</div>
+</section>
+<section id="automated-boundary-synthesis-and-coordinate-inversion-diagnosis" class="level2">
+<h2 class="anchored" data-anchor-id="automated-boundary-synthesis-and-coordinate-inversion-diagnosis">🤖 4. Automated Boundary Synthesis and Coordinate Inversion Diagnosis</h2>
+<p>When dealing with shapefiles from unverified open sources, one frequently encounters inverted coordinates (swapped X/Y coordinates), causing the rendered map to shift unexpectedly to the Arctic or Antarctic. This segment implements an automated blind check and correction routine.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Automatically find and merge the complete administrative contour for the current city</span></span>
+<span id="cb4-2">current_boundary <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> china_map_4326[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_intersects</span>(china_map_4326, df_current_sf, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sparse =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rowSums</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb4-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_union</span>()</span>
+<span id="cb4-4"></span>
+<span id="cb4-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Automatically diagnose if the current city's shapefile boundary suffers from coordinate inversion</span></span>
+<span id="cb4-6">bbox_check <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(current_boundary)</span>
+<span id="cb4-7"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]], bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]])) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]], bbox_check[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]]))) {</span>
+<span id="cb4-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"⚠️ Warning: Detected coordinate inversion in the administrative shp file. Automatically correcting...</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb4-9">  current_boundary <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_flip_coordinates</span>(current_boundary)</span>
+<span id="cb4-10">}</span>
+<span id="cb4-11"></span>
+<span id="cb4-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Ensure conversion to a standard terra vector object</span></span>
+<span id="cb4-13">city_vector_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vect</span>(current_boundary)</span></code></pre></div></div>
+</div>
+</section>
+<section id="intelligent-cropping-and-validity-matching-for-large-scale-raster-tifs" class="level2">
+<h2 class="anchored" data-anchor-id="intelligent-cropping-and-validity-matching-for-large-scale-raster-tifs">🔍 5. Intelligent Cropping and Validity Matching for Large-Scale Raster TIFs</h2>
+<p>When dealing with massive, tiled remote sensing TIF images (such as urbanization weight data), blindly merging them is highly memory-intensive.</p>
+<p>The logic of this algorithm is: first perform a blind check on whether the geometric bounding boxes intersect ➡️ execute a spatial trial clip ➡️ calculate whether there are non-NA valid pixels within the clipped region. A TIF tile will only be loaded if it actually contributes valid data to the target area.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">tif_files   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list.files</span>(tif_dir, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\\</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">.tif$"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full.names =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb5-2">raster_list <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(tif_files, rast)</span>
+<span id="cb5-3"></span>
+<span id="cb5-4">selected_raster_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span></span>
+<span id="cb5-5"></span>
+<span id="cb5-6"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_along</span>(raster_list)) {</span>
+<span id="cb5-7">  r <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> raster_list[[i]]</span>
+<span id="cb5-8">  r_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">project</span>(r, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"EPSG:4326"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"near"</span>)</span>
+<span id="cb5-9">  </span>
+<span id="cb5-10">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Step A: Bounding box intersection check</span></span>
+<span id="cb5-11">  is_intersected <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.related</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ext</span>(r_4326), city_vector_4326, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"intersects"</span>)</span>
+<span id="cb5-12">  </span>
+<span id="cb5-13">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (is_intersected) {</span>
+<span id="cb5-14">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Step B: Trial crop and check for null values</span></span>
+<span id="cb5-15">    test_crop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(r_4326, city_vector_4326)</span>
+<span id="cb5-16">    valid_pixels <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">values</span>(test_crop)))</span>
+<span id="cb5-17">    </span>
+<span id="cb5-18">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (valid_pixels <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>) {</span>
+<span id="cb5-19">      selected_raster_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> r_4326</span>
+<span id="cb5-20">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"📊 Smart match successful! "</span>, target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" found "</span>, valid_pixels, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" valid urbanization pixels in TIF #"</span>, i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>))</span>
+<span id="cb5-21">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">break</span></span>
+<span id="cb5-22">    } <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> {</span>
+<span id="cb5-23">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ℹ️ Notice: TIF #"</span>, i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" intersects geometrically but contains only NA values within the "</span>, target_city, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" boundary. Skipping...</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>))</span>
+<span id="cb5-24">    }</span>
+<span id="cb5-25">  }</span>
+<span id="cb5-26">}</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ℹ️ Notice: TIF #3 intersects geometrically but contains only NA values within the JN boundary. Skipping...
+📊 Smart match successful! JN found 63484 valid urbanization pixels in TIF #4.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.null</span>(selected_raster_4326)) {</span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"❌ Error: No valid pixels found within the city boundary across all TIF files in the directory!"</span>)</span>
+<span id="cb7-3">}</span></code></pre></div></div>
+</div>
+</section>
+<section id="dynamic-range-calculation-and-safe-spatial-cropping" class="level2">
+<h2 class="anchored" data-anchor-id="dynamic-range-calculation-and-safe-spatial-cropping">📐 6. Dynamic Range Calculation and Safe Spatial Cropping</h2>
+<p>To generate two distinct perspectives—the macro overview map and the local detailed map—we need to dynamically calculate their respective bounding boxes and add an appropriate buffer margin (padding) to prevent edge clipping.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 1. Dynamically calculate the bounding box for the local inset map</span></span>
+<span id="cb8-2">bbox_points <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(df_current_sf)</span>
+<span id="cb8-3">x_point_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span></span>
+<span id="cb8-4">y_point_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span></span>
+<span id="cb8-5"></span>
+<span id="cb8-6">local_xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> x_point_padding, bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_point_padding)</span>
+<span id="cb8-7">local_ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> y_point_padding, bbox_points[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> y_point_padding)</span>
+<span id="cb8-8">local_extent_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ext</span>(local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], local_xlim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], local_ylim[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span>
+<span id="cb8-9"></span>
+<span id="cb8-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2. Dynamically calculate the bounding box for the macro city overview map</span></span>
+<span id="cb8-11">bbox_city <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(current_boundary)</span>
+<span id="cb8-12">x_city_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span></span>
+<span id="cb8-13">y_city_padding <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span></span>
+<span id="cb8-14"></span>
+<span id="cb8-15">city_xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> x_city_padding, bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xmax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_city_padding)</span>
+<span id="cb8-16">city_ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymin"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> y_city_padding, bbox_city[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ymax"</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> y_city_padding)</span>
+<span id="cb8-17"></span>
+<span id="cb8-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># --- Execute Safe Cropping and Post-Processing ---</span></span>
+<span id="cb8-19">smod_macro_cropped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(selected_raster_4326, city_vector_4326)</span>
+<span id="cb8-20">smod_local_cropped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">crop</span>(selected_raster_4326, local_extent_4326)</span>
+<span id="cb8-21"></span>
+<span id="cb8-22">smod_macro_smooth <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">resample</span>(smod_macro_cropped, smod_macro_cropped, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bilinear"</span>)</span>
+<span id="cb8-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(smod_macro_smooth) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SMOD_Value"</span></span>
+<span id="cb8-24">smod_macro_masked <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mask</span>(smod_macro_smooth, city_vector_4326)</span>
+<span id="cb8-25"></span>
+<span id="cb8-26"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(smod_local_cropped) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SMOD_Class"</span></span>
+<span id="cb8-27">smod_local_4326 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">suppressWarnings</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.factor</span>(smod_local_cropped))</span>
+<span id="cb8-28"></span>
+<span id="cb8-29">gray_colors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb8-30">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"11"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#F0F0F0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"12"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#E0E0E0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"13"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D0D0D0"</span>, </span>
+<span id="cb8-31">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"21"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#B8B8B8"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"22"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#A0A0A0"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"23"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#888888"</span>, </span>
+<span id="cb8-32">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"30"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#686868"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NA"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"transparent"</span></span>
+<span id="cb8-33">)</span></code></pre></div></div>
+</div>
+</section>
+<section id="advanced-academic-cartography" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-academic-cartography">🎨 7. Advanced Academic Cartography</h2>
+<section id="map-1-macro-city-overview-adaptive-multi-city-version" class="level3">
+<h3 class="anchored" data-anchor-id="map-1-macro-city-overview-adaptive-multi-city-version">🗺️ Map 1: Macro City Overview (Adaptive Multi-City Version)</h3>
+<p>The core of this version lies in using <code>seq(..., length.out = 4)</code> to strictly constrain both axes to exactly 4 clean tick marks, regardless of city scale. Paired with explicit °E / °N suffixes, it meets international peer-reviewed journal standards.</p>
+</section>
+</section>
+<section id="core-algorithm-generate-exactly-4-evenly-spaced-tick-intervals-across-both-axes-regardless-of-city-size" class="level1">
+<h1>1. 🌟 [Core Algorithm]: Generate exactly 4 evenly spaced tick intervals across both axes, regardless of city size</h1>
+<p>x_breaks_nc &lt;- seq(from = city_xlim[1], to = city_xlim[2], length.out = 4) y_breaks_nc &lt;- seq(from = city_ylim[1], to = city_ylim[2], length.out = 4)</p>
+</section>
+<section id="dynamically-format-labels-keep-1-decimal-place-and-append-geographic-suffixes" class="level1">
+<h1>2. Dynamically format labels: Keep 1 decimal place and append geographic suffixes</h1>
+<p>x_labels_nc &lt;- paste0(sprintf(“%.1f”, x_breaks_nc), “°E”) y_labels_nc &lt;- paste0(sprintf(“%.1f”, y_breaks_nc), “°N”)</p>
+</section>
+<section id="render-standard-academic-map" class="level1">
+<h1>3. Render standard academic map</h1>
+<p>ggplot() + # Render smooth raster transitions within the city boundary geom_sp探索aster(data = smod_macro_masked, maxcell = Inf, alpha = 0.75) + scale_fill_gradient(low = “#F5F5F5”, high = “#505050”, name = “GHS_SMOD”, na.value = “transparent”) +</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>GIS</category>
+  <category>Spatial Analysis</category>
+  <guid>https://your-website-url.example.com/posts/r-spatial-map/index.en.html</guid>
+  <pubDate>Tue, 02 Jun 2026 16:00:00 GMT</pubDate>
+</item>
+<item>
   <title>Welcome To My Blog</title>
   <dc:creator>Tristan O&#39;Malley</dc:creator>
   <link>https://your-website-url.example.com/posts/welcome/</link>
@@ -1441,7 +2125,7 @@ font-style: inherit;">9</span>)</span>
 
  ]]></description>
   <guid>https://your-website-url.example.com/posts/r-spatial-map/</guid>
-  <pubDate>Wed, 03 Jun 2026 14:52:02 GMT</pubDate>
+  <pubDate>Wed, 01 Jul 2026 10:57:36 GMT</pubDate>
 </item>
 </channel>
 </rss>

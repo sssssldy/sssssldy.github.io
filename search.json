@@ -7,18 +7,74 @@
     "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
   },
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
+    "objectID": "posts/r-spatial-map/index.en.html",
+    "href": "posts/r-spatial-map/index.en.html",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
     "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+    "text": "This tutorial demonstrates how to leverage the latest sf (vector) and terra (raster) ecosystem in R to automatically match specific urban administrative boundaries with large-scale remote sensing TIF imagery. Combined with lake sampling point data, we will render publication-quality macro city overviews and localized detailed inset maps.\n🌟 Core Highlights\n\nFull Automation & Intelligence: Simply modify a single city code switch (e.g., JN), and the subsequent administrative boundary extraction and TIF tile matching will execute fully automatically.\nOverlap-Free Coordinate Axes: By dynamically computing breaks, this workflow thoroughly resolves the common pain point of overlapping longitude/latitude labels when using coord_sf at zoomed-in local scales.\nRobust Fault Tolerance: Features a built-in diagnostic and correction logic to handle coordinate flipping (reversed latitude/longitude) often found in open-source spatial datasets.\n\nFirst, load the core spatial analysis and visualization packages required for this workflow:\n\nlibrary(ggplot2)\nlibrary(sf)\nlibrary(dplyr)\nlibrary(terra)\nlibrary(tidyterra)"
   },
   {
-    "objectID": "gallery/index.html",
-    "href": "gallery/index.html",
-    "title": "野外采样画廊",
+    "objectID": "posts/r-spatial-map/index.en.html#introduction-and-environment-configuration",
+    "href": "posts/r-spatial-map/index.en.html#introduction-and-environment-configuration",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
     "section": "",
-    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n湖泊水体采样\n\n\n现场采集水样，用于后续浮游植物群落分析与理化指标测定。\n\n\n\n\n\n\n\n\n\n\n\n\n湿地野外观测\n\n\nwetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。\n\n\n\n\n\nNo matching items"
+    "text": "This tutorial demonstrates how to leverage the latest sf (vector) and terra (raster) ecosystem in R to automatically match specific urban administrative boundaries with large-scale remote sensing TIF imagery. Combined with lake sampling point data, we will render publication-quality macro city overviews and localized detailed inset maps.\n🌟 Core Highlights\n\nFull Automation & Intelligence: Simply modify a single city code switch (e.g., JN), and the subsequent administrative boundary extraction and TIF tile matching will execute fully automatically.\nOverlap-Free Coordinate Axes: By dynamically computing breaks, this workflow thoroughly resolves the common pain point of overlapping longitude/latitude labels when using coord_sf at zoomed-in local scales.\nRobust Fault Tolerance: Features a built-in diagnostic and correction logic to handle coordinate flipping (reversed latitude/longitude) often found in open-source spatial datasets.\n\nFirst, load the core spatial analysis and visualization packages required for this workflow:\n\nlibrary(ggplot2)\nlibrary(sf)\nlibrary(dplyr)\nlibrary(terra)\nlibrary(tidyterra)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#data-loading-and-path-configuration",
+    "href": "posts/r-spatial-map/index.en.html#data-loading-and-path-configuration",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "💾 2. Data Loading and Path Configuration",
+    "text": "💾 2. Data Loading and Path Configuration\n⚠️ Note: Please modify the following variables according to your local file paths.\n\n# [Please enter your local data paths here]\nchina_map   &lt;- st_read(\"D:/1work/2city/light/raw_data/行政区划/shi2022.shp\", quiet = TRUE) \nlake_data   &lt;- read.csv(\"D:/1work/2city/light/raw_data/湖泊总.csv\") \ntif_dir     &lt;- \"D:/1work/2city/light/raw_data/tif/\"\n\n# 🌟 [Core Toggle Switch]: Change this to whichever city you want to map, and the rest runs automatically!\ntarget_city &lt;- \"JN\""
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#data-cleaning-and-factor-order-locking",
+    "href": "posts/r-spatial-map/index.en.html#data-cleaning-and-factor-order-locking",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "🧹 3. Data Cleaning and Factor Order Locking",
+    "text": "🧹 3. Data Cleaning and Factor Order Locking\nTo ensure academic compliance and standard formatting of the map legend (e.g., sorting urbanization intensity from high to low: H -&gt; M -&gt; L), we need to factorize the unstructured attribute data and project all vectors into the globally standard WGS84 geographic coordinate system (EPSG:4326).\n\n# Uniformly transform to WGS84 geographic coordinate system\nchina_map_4326 &lt;- st_transform(china_map, crs = 4326)\n\n# Dynamically filter and explicitly lock the legend display order: city_H -&gt; city_M -&gt; city_L\ndf_current &lt;- lake_data %&gt;% \n  filter(City_Name == target_city) %&gt;% \n  mutate(City_Group = factor(City_Group, levels = c(\"city_H\", \"city_M\", \"city_L\")))\n\n# Convert to an sf spatial vector object\ndf_current_sf &lt;- st_as_sf(df_current, coords = c(\"Centroid_X\", \"Centroid_Y\"), crs = 4326)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#automated-boundary-synthesis-and-coordinate-inversion-diagnosis",
+    "href": "posts/r-spatial-map/index.en.html#automated-boundary-synthesis-and-coordinate-inversion-diagnosis",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "🤖 4. Automated Boundary Synthesis and Coordinate Inversion Diagnosis",
+    "text": "🤖 4. Automated Boundary Synthesis and Coordinate Inversion Diagnosis\nWhen dealing with shapefiles from unverified open sources, one frequently encounters inverted coordinates (swapped X/Y coordinates), causing the rendered map to shift unexpectedly to the Arctic or Antarctic. This segment implements an automated blind check and correction routine.\n\n# Automatically find and merge the complete administrative contour for the current city\ncurrent_boundary &lt;- china_map_4326[st_intersects(china_map_4326, df_current_sf, sparse = FALSE) %&gt;% rowSums() &gt; 0, ] %&gt;% \n  st_union()\n\n# Automatically diagnose if the current city's shapefile boundary suffers from coordinate inversion\nbbox_check &lt;- st_bbox(current_boundary)\nif (mean(c(bbox_check[[\"xmin\"]], bbox_check[[\"xmax\"]])) &lt; mean(c(bbox_check[[\"ymin\"]], bbox_check[[\"ymax\"]]))) {\n  cat(\"⚠️ Warning: Detected coordinate inversion in the administrative shp file. Automatically correcting...\\n\")\n  current_boundary &lt;- st_flip_coordinates(current_boundary)\n}\n\n# Ensure conversion to a standard terra vector object\ncity_vector_4326 &lt;- vect(current_boundary)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#intelligent-cropping-and-validity-matching-for-large-scale-raster-tifs",
+    "href": "posts/r-spatial-map/index.en.html#intelligent-cropping-and-validity-matching-for-large-scale-raster-tifs",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "🔍 5. Intelligent Cropping and Validity Matching for Large-Scale Raster TIFs",
+    "text": "🔍 5. Intelligent Cropping and Validity Matching for Large-Scale Raster TIFs\nWhen dealing with massive, tiled remote sensing TIF images (such as urbanization weight data), blindly merging them is highly memory-intensive.\nThe logic of this algorithm is: first perform a blind check on whether the geometric bounding boxes intersect ➡️ execute a spatial trial clip ➡️ calculate whether there are non-NA valid pixels within the clipped region. A TIF tile will only be loaded if it actually contributes valid data to the target area.\n\ntif_files   &lt;- list.files(tif_dir, pattern = \"\\\\.tif$\", full.names = TRUE)\nraster_list &lt;- lapply(tif_files, rast)\n\nselected_raster_4326 &lt;- NULL\n\nfor (i in seq_along(raster_list)) {\n  r &lt;- raster_list[[i]]\n  r_4326 &lt;- project(r, \"EPSG:4326\", method = \"near\")\n  \n  # Step A: Bounding box intersection check\n  is_intersected &lt;- is.related(ext(r_4326), city_vector_4326, \"intersects\")\n  \n  if (is_intersected) {\n    # Step B: Trial crop and check for null values\n    test_crop &lt;- crop(r_4326, city_vector_4326)\n    valid_pixels &lt;- sum(!is.na(values(test_crop)))\n    \n    if (valid_pixels &gt; 0) {\n      selected_raster_4326 &lt;- r_4326\n      cat(paste0(\"📊 Smart match successful! \", target_city, \" found \", valid_pixels, \" valid urbanization pixels in TIF #\", i, \".\\n\"))\n      break\n    } else {\n      cat(paste0(\"ℹ️ Notice: TIF #\", i, \" intersects geometrically but contains only NA values within the \", target_city, \" boundary. Skipping...\\n\"))\n    }\n  }\n}\n\nℹ️ Notice: TIF #3 intersects geometrically but contains only NA values within the JN boundary. Skipping...\n📊 Smart match successful! JN found 63484 valid urbanization pixels in TIF #4.\n\nif (is.null(selected_raster_4326)) {\n  stop(\"❌ Error: No valid pixels found within the city boundary across all TIF files in the directory!\")\n}"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#dynamic-range-calculation-and-safe-spatial-cropping",
+    "href": "posts/r-spatial-map/index.en.html#dynamic-range-calculation-and-safe-spatial-cropping",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "📐 6. Dynamic Range Calculation and Safe Spatial Cropping",
+    "text": "📐 6. Dynamic Range Calculation and Safe Spatial Cropping\nTo generate two distinct perspectives—the macro overview map and the local detailed map—we need to dynamically calculate their respective bounding boxes and add an appropriate buffer margin (padding) to prevent edge clipping.\n\n# 1. Dynamically calculate the bounding box for the local inset map\nbbox_points &lt;- st_bbox(df_current_sf)\nx_point_padding &lt;- (bbox_points[[\"xmax\"]] - bbox_points[[\"xmin\"]]) * 0.1\ny_point_padding &lt;- (bbox_points[[\"ymax\"]] - bbox_points[[\"ymin\"]]) * 0.1\n\nlocal_xlim &lt;- c(bbox_points[[\"xmin\"]] - x_point_padding, bbox_points[[\"xmax\"]] + x_point_padding)\nlocal_ylim &lt;- c(bbox_points[[\"ymin\"]] - y_point_padding, bbox_points[[\"ymax\"]] + y_point_padding)\nlocal_extent_4326 &lt;- ext(local_xlim[1], local_xlim[2], local_ylim[1], local_ylim[2])\n\n# 2. Dynamically calculate the bounding box for the macro city overview map\nbbox_city &lt;- st_bbox(current_boundary)\nx_city_padding &lt;- (bbox_city[[\"xmax\"]] - bbox_city[[\"xmin\"]]) * 0.05\ny_city_padding &lt;- (bbox_city[[\"ymax\"]] - bbox_city[[\"ymin\"]]) * 0.05\n\ncity_xlim &lt;- c(bbox_city[[\"xmin\"]] - x_city_padding, bbox_city[[\"xmax\"]] + x_city_padding)\ncity_ylim &lt;- c(bbox_city[[\"ymin\"]] - y_city_padding, bbox_city[[\"ymax\"]] + y_city_padding)\n\n# --- Execute Safe Cropping and Post-Processing ---\nsmod_macro_cropped &lt;- crop(selected_raster_4326, city_vector_4326)\nsmod_local_cropped &lt;- crop(selected_raster_4326, local_extent_4326)\n\nsmod_macro_smooth &lt;- resample(smod_macro_cropped, smod_macro_cropped, method = \"bilinear\")\nnames(smod_macro_smooth) &lt;- \"SMOD_Value\"\nsmod_macro_masked &lt;- mask(smod_macro_smooth, city_vector_4326)\n\nnames(smod_local_cropped) &lt;- \"SMOD_Class\"\nsmod_local_4326 &lt;- suppressWarnings(as.factor(smod_local_cropped))\n\ngray_colors &lt;- c(\n  \"11\" = \"#F0F0F0\", \"12\" = \"#E0E0E0\", \"13\" = \"#D0D0D0\", \n  \"21\" = \"#B8B8B8\", \"22\" = \"#A0A0A0\", \"23\" = \"#888888\", \n  \"30\" = \"#686868\", \"NA\" = \"transparent\"\n)"
+  },
+  {
+    "objectID": "posts/r-spatial-map/index.en.html#advanced-academic-cartography",
+    "href": "posts/r-spatial-map/index.en.html#advanced-academic-cartography",
+    "title": "R-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points",
+    "section": "🎨 7. Advanced Academic Cartography",
+    "text": "🎨 7. Advanced Academic Cartography\n\n🗺️ Map 1: Macro City Overview (Adaptive Multi-City Version)\nThe core of this version lies in using seq(..., length.out = 4) to strictly constrain both axes to exactly 4 clean tick marks, regardless of city scale. Paired with explicit °E / °N suffixes, it meets international peer-reviewed journal standards."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "sssssldy",
+    "section": "",
+    "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nR-Based Tutorial on Visualizing City-Level Urbanization Intensity and Lake Sampling Points\n\n\n\nR\n\nGIS\n\nSpatial Analysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nsssssldy\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "en/index.html",
+    "href": "en/index.html",
+    "title": "sssssldy",
+    "section": "",
+    "text": "No matching items"
   },
   {
     "objectID": "about.html",
@@ -28,11 +84,25 @@
     "text": "About this blog"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "sssssldy",
+    "objectID": "en/about.html",
+    "href": "en/about.html",
+    "title": "About",
     "section": "",
-    "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
+    "text": "About this blog"
+  },
+  {
+    "objectID": "gallery/index.html",
+    "href": "gallery/index.html",
+    "title": "野外采样画廊",
+    "section": "",
+    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n湖泊水体采样\n\n\n现场采集水样，用于后续浮游植物群落分析与理化指标测定。\n\n\n\n\n\n\n\n\n\n\n\n\n湿地野外观测\n\n\nwetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
   },
   {
     "objectID": "posts/r-spatial-map/index.html",
