@@ -1,831 +1,448 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的野外采样足迹与随笔</title>
+    <!-- 引入 Leaflet 地图库的样式与脚本 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        /* 页面整体布局：左右 1/6 留白 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            /* 页面基础UI字体：使用现代、清晰的无衬线系统字体 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            overflow: hidden; /* 禁止全屏滚动 */
+            background-color: #0c0c0e; /* 网页最外层留白背景（极深优雅黑） */
+            display: flex;
+            justify-content: center; /* 居中显示核心内容 */
+            align-items: center;
+        }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+        /* 核心展示区域：左右各空出 1/6 (总宽度占 66.67%) */
+        #main-wrapper {
+            width: 66.67%;
+            height: 100%;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.7); /* 为边缘添加微弱投影 */
+            overflow: hidden;
+        }
 
+        /* 背景媒体容器：并排容纳地图与九宫格照片墙 */
+        #media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            z-index: 1;
+        }
 
-<title>采样地图 – sssssldy</title>
-<style>
-/* Default styles provided by pandoc.
-** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-*/
-code{white-space: pre-wrap;}
-span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
-}
-</style>
+        /* 左侧地图区域：占 wrapper 的 50% 宽度 */
+        #map-container {
+            width: 50%;
+            height: 100%;
+        }
 
+        #map {
+            width: 100%;
+            height: 100%;
+        }
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-a0f9fd0d421825b736dc1bbcbcba2219.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
+        /* 右侧展示区域：占 wrapper 的 50% 宽度，三列九宫格网格 */
+        #photo-stream {
+            width: 50%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 40px 30px 45vh 30px; /* 底部留出足够空间，防止图片被初始浮动卡片遮挡 */
+            background-color: #16161a; /* 深色面板背景 */
+            border-left: 1px solid #2a2a30;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 确认为三列九宫格排布 */
+            gap: 12px; /* 照片卡片之间的间距 */
+            grid-auto-rows: max-content;
+            overflow-y: auto; /* 照片墙自身可独立滚动 */
+        }
 
+        /* 九宫格单张图片卡片 */
+        .photo-card {
+            width: 100%;
+            border-radius: 6px; 
+            overflow: hidden;
+            background-color: #1a1a1f; /* 卡片背景色 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .photo-card:hover {
+            transform: scale(1.04); /* 悬停时轻微放大 */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
 
-<link rel="stylesheet" href="../styles.css">
+        /* 卡片中的图片样式：完美正方形裁剪 */
+        .photo-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* 核心：强制正方形比例 */
+            object-fit: cover; /* 核心：不拉伸不变形，按中心自动裁剪填满 */
+            filter: brightness(0.9);
+            transition: filter 0.3s ease;
+            cursor: pointer; /* 悬停时手势提示 */
+        }
+
+        .photo-card:hover img {
+            filter: brightness(1.05); /* 悬停时图片微微变亮 */
+        }
+
+        /* 照片下方的精致标题框 */
+        .photo-caption {
+            padding: 8px 5px;
+            color: #aaaaaa; /* 降低亮度，减少视觉干扰 */
+            font-size: 0.72rem; /* 适当缩小字体以适应三列小格 */
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 1px; /* 字母间距拉开，更具设计感 */
+            background-color: #111114; /* 稍微深一些的底部标题栏 */
+            border-top: 1px solid #25252b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 文字超长时显示省略号 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        /* 全局滚动文本层：浮动在媒体层之上 */
+        #text-overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; /* 允许此处进行整站纵向滚动 */
+            z-index: 2;
+            pointer-events: none; /* 关键：点击穿透，使上方 2/3 的地图和照片依然可以被交互 */
+        }
+
+        /* 顶部占位器：占屏幕高度的 2/3 (即从底部 1/3 开始显示文字) */
+        #text-overlay-container .spacer {
+            height: 66.67vh;
+            pointer-events: none;
+        }
+
+        /* 悬浮文字内容卡片 */
+        #site-text-card {
+            pointer-events: auto; /* 恢复卡片区域的鼠标交互 */
+            background: linear-gradient(to bottom, rgba(22, 22, 26, 0.92) 0%, rgba(22, 22, 26, 0.99) 150px, #16161a 100%);
+            backdrop-filter: blur(15px); /* 强化现代毛玻璃半透明效果 */
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08); /* 精致的分界线 */
+            padding: 45px 55px 65px 55px; /* 增加内边距，让排版更加呼吸透气 */
+            box-sizing: border-box;
+            min-height: 33.33vh; /* 保证至少填满下方的 1/3 屏幕 */
+            box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.6); /* 向上投射的柔和阴影 */
+        }
+
+        /* 标题部分：现代、干净、具有仪式感 */
+        #site-title {
+            margin: 0 0 25px 0;
+            color: #ffffff;
+            font-size: 1.65rem;
+            font-weight: 500;
+            letter-spacing: 2px; /* 宽字间距，展现画廊标题感 */
+            display: flex;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        }
+        
+        #site-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 1.2rem;
+            background-color: #00d2ff;
+            margin-right: 12px;
+            border-radius: 1px;
+        }
+
+        /* 随笔正文文本容器：使用古典高雅的衬线书宋体 */
+        #site-text {
+            /* 依次适配：苹果系统的宋体、Windows系统的中易宋体、思源宋体，最后降级到标准衬线体 */
+            font-family: "Georgia", "Nimbus Roman No9 L", "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+            color: #e2e2e5; /* 微微调亮字体颜色，确保在深色毛玻璃背景上有极佳的对比度与可读性 */
+            font-size: 1.05rem; /* 适当微调中文字体大小，让宋体细节更清晰 */
+            text-align: justify; /* 左右两端对齐 */
+        }
+
+        /* 段落美化 */
+        #site-text p {
+            line-height: 2.0; /* 增加到 2.0 倍行高，给予诗意段落更充足的呼吸空间 */
+            margin: 0 0 22px 0; /* 略微拉大段间距 */
+            text-indent: 2em;    /* 首行缩进两个中文字符 */
+            letter-spacing: 0.06em; /* 汉字字间距轻微拉开，营造出铅字印刷般的透气美感 */
+        }
+
+        #site-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 滚动条美化 */
+        #photo-stream::-webkit-scrollbar,
+        #text-overlay-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        #photo-stream::-webkit-scrollbar-thumb,
+        #text-overlay-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-radius: 2px;
+        }
+        #photo-stream::-webkit-scrollbar-track,
+        #text-overlay-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* 全屏图片灯箱 (Lightbox) */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(10, 10, 12, 0.95);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+        #lightbox img {
+            max-width: 85%;
+            max-height: 85%;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #lightbox.active img {
+            transform: scale(1);
+        }
+        #lightbox .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 36px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        #lightbox .close-btn:hover {
+            color: #ffffff;
+        }
+    </style>
 </head>
+<body>
 
-<body class="nav-fixed quarto-light">
+    <!-- 1/6 居中包裹容器 -->
+    <div id="main-wrapper">
+        <!-- 底层背景：地图 + 照片 -->
+        <div id="media-container">
+            <!-- 左侧地图 -->
+            <div id="map-container">
+                <div id="map"></div>
+            </div>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">sssssldy</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../index.html"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text">sssssldy</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../gallery/index.html"> 
-<span class="menu-text">画廊</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="../map/index.html" aria-current="page"> 
-<span class="menu-text">地图</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://bsky.app/"> <i class="bi bi-bluesky" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
-    
-<!-- main -->
-<main class="content column-page" id="quarto-document-content">
+            <!-- 右侧三列九宫格网格 -->
+            <div id="photo-stream">
+                <!-- 图片卡片由 JavaScript 动态载入 -->
+            </div>
+        </div>
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">采样地图</h1>
-<p class="subtitle lead">点击或悬停标记点查看采样照片</p>
-</div>
-
-
-
-<div class="quarto-title-meta column-page">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="map-container">
-<div class="map-section">
-<pre><code>&lt;h3 style="margin: 0 0 16px 0; color: #333; font-size: 1.25rem;"&gt;采样点位分布&lt;/h3&gt;
-&lt;div id="map"&gt;&lt;/div&gt;</code></pre>
-</div>
-<div class="info-section">
-<pre><code>&lt;div id="info-content"&gt;
-  &lt;div class="welcome-message"&gt;
-    &lt;div class="welcome-icon"&gt;🗺️&lt;/div&gt;
-    &lt;h3&gt;选择采样点&lt;/h3&gt;
-    &lt;p&gt;将鼠标悬停或点击地图上的蓝色标记点，查看该地点的采样照片和经历说明&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-</div>
-</div>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRS9BMY=" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-const samplingPoints = [
-  {
-    name: "武汉东湖",
-    location: "湖北省武汉市",
-    latitude: 30.5423,
-    longitude: 114.3574,
-    description: "2026年夏季，我们在东湖进行了为期一周的采样工作。东湖作为武汉市最大的城中湖，水质状况对城市生态至关重要。采样期间天气炎热，但团队成员依然坚持完成了20个点位的水样采集，涵盖了东湖的主要湖区和入湖河流。通过对浮游植物群落和理化指标的分析，我们希望能为东湖的生态保护提供科学依据。",
-    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
-  },
-  {
-    name: "梁子湖湿地",
-    location: "湖北省鄂州市",
-    latitude: 30.2423,
-    longitude: 114.6574,
-    description: "梁子湖是湖北省第二大淡水湖，也是国家湿地公园。这里生态环境优美，生物多样性丰富。我们在这里进行了eDNA（环境DNA）采样，这种非侵入式的采样方法可以在不打扰生物的情况下检测物种分布。采样过程中我们还观察到了多种珍稀鸟类和湿地植物。",
-    photos: ["../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
-  },
-  {
-    name: "杭州西湖",
-    location: "浙江省杭州市",
-    latitude: 30.2741,
-    longitude: 120.1551,
-    description: "西湖不仅是著名的风景名胜区，也是城市生态系统的重要组成部分。我们在这里开展了与武汉东湖的对比研究，分析城市景观水体的生态特征差异。西湖的水质管理经验为其他城市湖泊的治理提供了很好的参考。",
-    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg"]
-  },
-  {
-    name: "滇池",
-    location: "云南省昆明市",
-    latitude: 24.8820,
-    longitude: 102.8340,
-    description: "滇池是云南省最大的淡水湖，近年来经历了大规模的生态治理。我们参与了滇池水质监测项目，评估治理效果。采样过程中我们看到了滇池生态环境的显著改善，许多水生植物重新生长，鸟类也逐渐回归。",
-    photos: ["../gallery/photos/lake_sampling2.jpg"]
-  },
-  {
-    name: "洱海",
-    location: "云南省大理市",
-    latitude: 25.6046,
-    longitude: 100.1868,
-    description: "洱海是高原淡水湖泊的典型代表，水质清澈，风景秀丽。我们在这里进行了高原湖泊特有物种的调查，发现了一些有趣的浮游生物群落特征。洱海的生态保护工作做得非常出色，给我们留下了深刻印象。",
-    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
-  }
-];
-
-const map = L.map('map', {
-  zoomControl: false,
-  scrollWheelZoom: false,
-  doubleClickZoom: false,
-  dragging: false,
-  touchZoom: false
-}).setView([30, 115], 4);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-map.setMaxZoom(4);
-map.setMinZoom(4);
-
-const markerIcon = L.divIcon({
-  className: 'sampling-marker',
-  html: '<div class="marker-dot"></div>',
-  iconSize: [20, 20],
-  iconAnchor: [10, 10]
-});
-
-samplingPoints.forEach((point, index) => {
-  const marker = L.marker([point.latitude, point.longitude], { icon: markerIcon }).addTo(map);
-  
-  marker.on('mouseover', function() {
-    showPointInfo(index);
-  });
-  
-  marker.on('click', function() {
-    showPointInfo(index);
-  });
-});
-
-function showPointInfo(index) {
-  const point = samplingPoints[index];
-  const content = document.getElementById('info-content');
-  
-  let photosHtml = '';
-  point.photos.forEach((photo, i) => {
-    photosHtml += `
-      <div class="waterfall-item">
-        <img src="${photo}" alt="${point.name} 照片 ${i + 1}" class="waterfall-img" />
-      </div>
-    `;
-  });
-  
-  content.innerHTML = `
-    <div class="point-info">
-      <h2 class="point-name">${point.name}</h2>
-      <p class="point-location">📍 ${point.location}</p>
-      
-      <div class="photos-waterfall">
-        ${photosHtml}
-      </div>
-      
-      <div class="point-description">
-        <h4>采样经历</h4>
-        <p>${point.description}</p>
-      </div>
+        <!-- 表层浮动滚动文字层 -->
+        <div id="text-overlay-container">
+            <!-- 占位器，留出顶部 2/3 -->
+            <div class="spacer"></div>
+            <!-- 文字内容卡片 -->
+            <div id="site-text-card">
+                <h3 id="site-title">采样站点信息</h3>
+                <div id="site-text">
+                    <p>请将鼠标悬停在左侧地图上的亮蓝色标志点，查看该地点的采样故事与现场风光。</p>
+                </div>
+            </div>
+        </div>
     </div>
-  `;
-}
-</script>
-<style>
-.map-container {
-  display: flex;
-  gap: 30px;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
 
-.map-section {
-  flex: 1;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
+    <!-- 现场照片大图放大灯箱结构 -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <span class="close-btn">&times;</span>
+        <img id="lightbox-img" src="" alt="放大预览" onclick="event.stopPropagation();" />
+    </div>
 
-#map {
-  height: 700px;
-  width: 100%;
-  border-radius: 8px;
-}
+    <script>
+        // 1. 数据配置：陕西潼关湿地（包含每张现场图片的专属标题）
+        const sampleData = [
+            {
+                id: 1,
+                name: "陕西潼关湿地",
+                lat: 34.615,   // 潼关黄河湿地真实纬度
+                lng: 110.263,  // 潼关黄河湿地真实经度
+                text: `在夏天，北方的大晴天让人很吃不消。但是夜晚就很柔和了。今天我们班在傍晚集体到黄河边坐快艇，河风吹乱了大家的头发。
 
-.info-section {
-  flex: 1;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  max-height: 740px;
-  overflow-y: auto;
-}
+远山淡青色。水是黄浊的，不湍急，倒是很缓和，推扫着零散着烟头的土滩。我似乎是第一次见褶皱如此细密的水面，像是布满了银色黑色的发晶。
 
-#info-content {
-  min-height: 100%;
-}
+停靠在码头的船舫顶系满了透明的彩旗，同学们迎着夕阳拍照。天色慢慢变黑，灯塔和山顶开始闪烁，我能听见夜风呼啸的声音了。
 
-.welcome-message {
-  text-align: center;
-  padding: 60px 20px;
-  color: #666;
-}
-
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-}
-
-.welcome-message h3 {
-  margin: 0 0 12px 0;
-  color: #333;
-  font-size: 1.5rem;
-}
-
-.welcome-message p {
-  margin: 0;
-  line-height: 1.6;
-}
-
-.point-info {
-  color: #333;
-}
-
-.point-name {
-  margin: 0 0 8px 0;
-  font-size: 1.75rem;
-  color: #1a73e8;
-}
-
-.point-location {
-  margin: 0 0 20px 0;
-  font-size: 1rem;
-  color: #666;
-}
-
-.photos-waterfall {
-  column-count: 2;
-  column-gap: 12px;
-  margin-bottom: 24px;
-}
-
-.waterfall-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.waterfall-img {
-  width: 100%;
-  display: block;
-}
-
-.point-description {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.point-description h4 {
-  margin: 0 0 12px 0;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.point-description p {
-  margin: 0;
-  line-height: 1.7;
-  color: #555;
-  font-size: 0.95rem;
-  text-align: justify;
-}
-
-.sampling-marker .marker-dot {
-  width: 16px;
-  height: 16px;
-  background: #4285f4;
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.5);
-  transition: all 0.3s ease;
-}
-
-.sampling-marker:hover .marker-dot,
-.sampling-marker:active .marker-dot {
-  background: #2a76f6;
-  transform: scale(1.3);
-  box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2);
-}
-
-@media (max-width: 1024px) {
-  .map-container {
-    flex-direction: column;
-  }
-  
-  #map {
-    height: 500px;
-  }
-  
-  .photos-waterfall {
-    column-count: 1;
-  }
-}
-</style>
-
-
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
-      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/your-website-url\.example\.com");
-      var isInternal = (href) => {
-          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-      }
-      // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-      for (var i=0; i<links.length; i++) {
-        const link = links[i];
-        if (!isInternal(link.href)) {
-          // undo the damage that might have been done by quarto-nav.js in the case of
-          // links that we want to consider external
-          if (link.dataset.originalHref !== undefined) {
-            link.href = link.dataset.originalHref;
-          }
-        }
-      }
-    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-      const config = {
-        allowHTML: true,
-        maxWidth: 500,
-        delay: 100,
-        arrow: false,
-        appendTo: function(el) {
-            return el.parentElement;
-        },
-        interactive: true,
-        interactiveBorder: 10,
-        theme: 'quarto',
-        placement: 'bottom-start',
-      };
-      if (contentFn) {
-        config.content = contentFn;
-      }
-      if (onTriggerFn) {
-        config.onTrigger = onTriggerFn;
-      }
-      if (onUntriggerFn) {
-        config.onUntrigger = onUntriggerFn;
-      }
-      window.tippy(el, config); 
-    }
-    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-    for (var i=0; i<noterefs.length; i++) {
-      const ref = noterefs[i];
-      tippyHover(ref, function() {
-        // use id or data attribute instead here
-        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-        try { href = new URL(href).hash; } catch {}
-        const id = href.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note) {
-          return note.innerHTML;
-        } else {
-          return "";
-        }
-      });
-    }
-    const xrefs = window.document.querySelectorAll('a.quarto-xref');
-    const processXRef = (id, note) => {
-      // Strip column container classes
-      const stripColumnClz = (el) => {
-        el.classList.remove("page-full", "page-columns");
-        if (el.children) {
-          for (const child of el.children) {
-            stripColumnClz(child);
-          }
-        }
-      }
-      stripColumnClz(note)
-      if (id === null || id.startsWith('sec-')) {
-        // Special case sections, only their first couple elements
-        const container = document.createElement("div");
-        if (note.children && note.children.length > 2) {
-          container.appendChild(note.children[0].cloneNode(true));
-          for (let i = 1; i < note.children.length; i++) {
-            const child = note.children[i];
-            if (child.tagName === "P" && child.innerText === "") {
-              continue;
-            } else {
-              container.appendChild(child.cloneNode(true));
-              break;
+我突然想起之前和几个一直生活在内地未见过海的朋友，在外地活动时特地抽出时间去看海。在山道上骑了好久的自行车，问了不少的人，最后终于在广场上的围栏边瞅见了黑黝黝的海。感觉有些可惜，我希望他们那时能看到的是比今天更美丽的大海。`,
+                images: [
+                    { url: "./smpling/TG1.jpg", title: "滤膜夹取准备" },
+                    { url: "./smpling/TG2.jpg", title: "远山风机观测" },
+                    { url: "./smpling/TG3.jpg", title: "黄河滩涂沙洲" },
+                    { url: "./smpling/TG4.jpg", title: "停泊码头一隅" },
+                    { url: "./smpling/TG5.jpg", title: "沿岸防护林区" },
+                    { url: "./smpling/TG6.jpg", title: "铁道大桥采样" },
+                    { url: "./smpling/TG7.jpg", title: "生境镜中世界" },
+                    { url: "./smpling/TG8.jpg", title: "样本采集灌装" }
+                ]
             }
-          }
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(container);
-          }
-          return container.innerHTML
-        } else {
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(note);
-          }
-          return note.innerHTML;
-        }
-      } else {
-        // Remove any anchor links if they are present
-        const anchorLink = note.querySelector('a.anchorjs-link');
-        if (anchorLink) {
-          anchorLink.remove();
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        if (note.classList.contains("callout")) {
-          return note.outerHTML;
-        } else {
-          return note.innerHTML;
-        }
-      }
-    }
-    for (var i=0; i<xrefs.length; i++) {
-      const xref = xrefs[i];
-      tippyHover(xref, undefined, function(instance) {
-        instance.disable();
-        let url = xref.getAttribute('href');
-        let hash = undefined; 
-        if (url.startsWith('#')) {
-          hash = url;
-        } else {
-          try { hash = new URL(url).hash; } catch {}
-        }
-        if (hash) {
-          const id = hash.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note !== null) {
-            try {
-              const html = processXRef(id, note.cloneNode(true));
-              instance.setContent(html);
-            } finally {
-              instance.enable();
-              instance.show();
-            }
-          } else {
-            // See if we can fetch this
-            fetch(url.split('#')[0])
-            .then(res => res.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const htmlDoc = parser.parseFromString(html, "text/html");
-              const note = htmlDoc.getElementById(id);
-              if (note !== null) {
-                const html = processXRef(id, note);
-                instance.setContent(html);
-              } 
-            }).finally(() => {
-              instance.enable();
-              instance.show();
-            });
-          }
-        } else {
-          // See if we can fetch a full url (with no hash to target)
-          // This is a special case and we should probably do some content thinning / targeting
-          fetch(url)
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.querySelector('main.content');
-            if (note !== null) {
-              // This should only happen for chapter cross references
-              // (since there is no id in the URL)
-              // remove the first header
-              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-                note.children[0].remove();
-              }
-              const html = processXRef(null, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      }, function(instance) {
-      });
-    }
-        let selectedAnnoteEl;
-        const selectorForAnnotation = ( cell, annotation) => {
-          let cellAttr = 'data-code-cell="' + cell + '"';
-          let lineAttr = 'data-code-annotation="' +  annotation + '"';
-          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-          return selector;
-        }
-        const selectCodeLines = (annoteEl) => {
-          const doc = window.document;
-          const targetCell = annoteEl.getAttribute("data-target-cell");
-          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-          const lineIds = lines.map((line) => {
-            return targetCell + "-" + line;
-          })
-          let top = null;
-          let height = null;
-          let parent = null;
-          if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
-            }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
-            }
-            selectedAnnoteEl = annoteEl;
-          }
+        ];
+
+        // 2. 初始化地图并微调中心
+        const map = L.map('map', {
+            zoomControl: false,       // 隐藏默认的放大缩小按钮
+            scrollWheelZoom: false,  // 禁止滚轮缩放
+            doubleClickZoom: false,  // 禁止双击放大
+            boxZoom: false,          // 禁止框选放大
+            dragPan: false,          // 完全锁死拖拽
+            touchZoom: false         // 禁止手机端双指缩放
+        }).setView([34.0, 108.0], 3);
+
+        // 3. 载入高质量极简暗色底图
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
+
+        // 4. 定义亮蓝色闪耀圆圈样式
+        const markerOptions = {
+            radius: 8,
+            fillColor: "#00d2ff", // 电光亮蓝
+            color: "#ffffff",     // 白色边缘
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.95
         };
-        const unselectCodeLines = () => {
-          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-          elementsIds.forEach((elId) => {
-            const div = window.document.getElementById(elId);
-            if (div) {
-              div.remove();
-            }
-          });
-          selectedAnnoteEl = undefined;
-        };
-          // Handle positioning of the toggle
-      window.addEventListener(
-        "resize",
-        throttle(() => {
-          elRect = undefined;
-          if (selectedAnnoteEl) {
-            selectCodeLines(selectedAnnoteEl);
-          }
-        }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
-              fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
-        // Attach click handler to the DT
-        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-        for (const annoteDlNode of annoteDls) {
-          annoteDlNode.addEventListener('click', (event) => {
-            const clickedEl = event.target;
-            if (clickedEl !== selectedAnnoteEl) {
-              unselectCodeLines();
-              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-              if (activeEl) {
-                activeEl.classList.remove('code-annotation-active');
-              }
-              selectCodeLines(clickedEl);
-              clickedEl.classList.add('code-annotation-active');
-            } else {
-              // Unselect the line
-              unselectCodeLines();
-              clickedEl.classList.remove('code-annotation-active');
-            }
-          });
+
+        // 5. 灯箱开启与关闭逻辑
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(imgUrl) {
+            lightboxImg.src = imgUrl;
+            lightbox.classList.add('active');
         }
-    const findCites = (el) => {
-      const parentEl = el.parentElement;
-      if (parentEl) {
-        const cites = parentEl.dataset.cites;
-        if (cites) {
-          return {
-            el,
-            cites: cites.split(' ')
-          };
-        } else {
-          return findCites(el.parentElement)
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
         }
-      } else {
-        return undefined;
-      }
-    };
-    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-    for (var i=0; i<bibliorefs.length; i++) {
-      const ref = bibliorefs[i];
-      const citeInfo = findCites(ref);
-      if (citeInfo) {
-        tippyHover(citeInfo.el, function() {
-          var popup = window.document.createElement('div');
-          citeInfo.cites.forEach(function(cite) {
-            var citeDiv = window.document.createElement('div');
-            citeDiv.classList.add('hanging-indent');
-            citeDiv.classList.add('csl-entry');
-            var biblioDiv = window.document.getElementById('ref-' + cite);
-            if (biblioDiv) {
-              citeDiv.innerHTML = biblioDiv.innerHTML;
-            }
-            popup.appendChild(citeDiv);
-          });
-          return popup.innerHTML;
+
+        // 监听 ESC 键关闭灯箱
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
         });
-      }
-    }
-  });
-  </script>
-</div> <!-- /content -->
 
+        // 6. 更新展示界面的函数
+        function updateRightPanel(data) {
+            // 写入地名
+            document.getElementById('site-title').innerText = data.name;
+            
+            // 写入多分段故事
+            const textContainer = document.getElementById('site-text');
+            textContainer.innerHTML = ''; // 清空原有内容
+            
+            // 按照换行符切割文本，并过滤掉多余的空行
+            const paragraphs = data.text.split('\n');
+            paragraphs.forEach(pText => {
+                const trimmedText = pText.trim();
+                if (trimmedText.length > 0) {
+                    const p = document.createElement('p');
+                    p.innerText = trimmedText;
+                    textContainer.appendChild(p);
+                }
+            });
 
+            // 载入图片流（三列九宫格网格，强制正方形）
+            const stream = document.getElementById('photo-stream');
+            stream.innerHTML = ''; 
+            data.images.forEach(imgData => {
+                // 创建一个包裹卡片容器
+                const card = document.createElement('div');
+                card.className = 'photo-card';
 
+                // 创建图片
+                const img = document.createElement('img');
+                img.src = imgData.url;
+                img.alt = imgData.title;
+                
+                // 绑定图片点击查看大图事件
+                img.addEventListener('click', () => openLightbox(imgData.url));
 
-</body></html>
+                // 处理加载失败
+                img.onerror = () => {
+                    card.style.display = 'none';
+                    console.log(`未找到图片: ${imgData.url}，请确认其放在了 smpling 文件夹内并且文件名正确。`);
+                };
+
+                // 创建标题框
+                const caption = document.createElement('div');
+                caption.className = 'photo-caption';
+                caption.innerText = imgData.title;
+
+                // 装配卡片并添加到网格中
+                card.appendChild(img);
+                card.appendChild(caption);
+                stream.appendChild(card);
+            });
+
+            // 切换点位时，自动将文字滚动条平滑重置回顶部
+            document.getElementById('text-overlay-container').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 7. 渲染坐标点
+        sampleData.forEach(site => {
+            const marker = L.circleMarker([site.lat, site.lng], markerOptions).addTo(map);
+
+            // 鼠标悬停事件
+            marker.on('mouseover', function () {
+                this.setStyle({ fillColor: '#ffffff', radius: 10 }); // 悬停时高亮放大成白色
+                updateRightPanel(site);
+            });
+
+            // 鼠标移出事件
+            marker.on('mouseout', function () {
+                this.setStyle(markerOptions); // 恢复原状
+            });
+
+            // 鼠标点击事件（兼顾触屏设备）
+            marker.on('click', function () {
+                updateRightPanel(site);
+            });
+        });
+
+        // 8. 页面首次加载时，默认自动展示第一个采样点（潼关湿地）的内容
+        if (sampleData.length > 0) {
+            updateRightPanel(sampleData[0]);
+        }
+    </script>
+</body>
+</html>

@@ -14,32 +14,11 @@
     "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
   },
   {
-    "objectID": "map/index.html",
-    "href": "map/index.html",
-    "title": "采样地图",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "sssssldy",
     "section": "",
-    "text": "&lt;h3 style=\"margin: 0 0 16px 0; color: #333; font-size: 1.25rem;\"&gt;采样点位分布&lt;/h3&gt;\n&lt;div id=\"map\"&gt;&lt;/div&gt;\n\n\n&lt;div id=\"info-content\"&gt;\n  &lt;div class=\"welcome-message\"&gt;\n    &lt;div class=\"welcome-icon\"&gt;🗺️&lt;/div&gt;\n    &lt;h3&gt;选择采样点&lt;/h3&gt;\n    &lt;p&gt;将鼠标悬停或点击地图上的蓝色标记点，查看该地点的采样照片和经历说明&lt;/p&gt;\n  &lt;/div&gt;\n&lt;/div&gt;"
-  },
-  {
-    "objectID": "gallery/index.html",
-    "href": "gallery/index.html",
-    "title": "野外采样画廊",
-    "section": "",
-    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n湖泊水体采样\n\n\n现场采集水样，用于后续浮游植物群落分析与理化指标测定。\n\n\n\n\n\n\n\n\n\n\n\n\n湿地野外观测\n\n\nwetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "en/about.html",
-    "href": "en/about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
+    "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n醒目的毒果与应激的蟑螂：深夜的自然碎碎念\n\n\n\n随笔\n\n自然观察\n\n漫想\n\n\n\n\n\n\n\n\n\nJul 3, 2026\n\n\nHaoqing Xu\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "en/index.html",
@@ -49,11 +28,25 @@
     "text": "No matching items"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "sssssldy",
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
     "section": "",
-    "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n醒目的毒果与应激的蟑螂：深夜的自然碎碎念\n\n\n\n随笔\n\n自然观察\n\n漫想\n\n\n\n\n\n\n\n\n\nJul 3, 2026\n\n\nHaoqing Xu\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
+    "text": "About this blog"
+  },
+  {
+    "objectID": "en/about.html",
+    "href": "en/about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "gallery/index.html",
+    "href": "gallery/index.html",
+    "title": "野外采样画廊",
+    "section": "",
+    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n湖泊水体采样\n\n\n现场采集水样，用于后续浮游植物群落分析与理化指标测定。\n\n\n\n\n\n\n\n\n\n\n\n\n湿地野外观测\n\n\nwetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2026-07-03-my-essay/index.html",

@@ -1,13 +1,5 @@
 [
   {
-    "listing": "/gallery/index.html",
-    "items": []
-  },
-  {
-    "listing": "/en/index.html",
-    "items": []
-  },
-  {
     "listing": "/index.html",
     "items": [
       "/posts/r-spatial-map/index.html",
@@ -15,5 +7,13 @@
       "/posts/post-with-code/index.html",
       "/posts/welcome/index.html"
     ]
+  },
+  {
+    "listing": "/en/index.html",
+    "items": []
+  },
+  {
+    "listing": "/gallery/index.html",
+    "items": []
   }
 ]
