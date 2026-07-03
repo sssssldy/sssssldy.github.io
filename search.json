@@ -46,7 +46,7 @@
     "href": "gallery/index.html",
     "title": "野外采样画廊",
     "section": "",
-    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n湖泊水体采样\n\n\n现场采集水样，用于后续浮游植物群落分析与理化指标测定。\n\n\n\n\n\n\n\n\n\n\n\n\n湿地野外观测\n\n\nwetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。\n\n\n\n\n\nNo matching items"
+    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n&lt;button class=\"filter-tab active\" onclick=\"filterGallery('all')\"&gt;全部&lt;/button&gt;\n&lt;button class=\"filter-tab\" onclick=\"filterGallery('2025')\"&gt;2025&lt;/button&gt;\n&lt;button class=\"filter-tab\" onclick=\"filterGallery('2026')\"&gt;2026&lt;/button&gt;"
   },
   {
     "objectID": "posts/2026-07-03-my-essay/index.html",
