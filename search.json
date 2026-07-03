@@ -21,11 +21,11 @@
     "text": "基于 R 语言的城市级城镇化强度与湖泊采样点可视化教程\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n醒目的毒果与应激的蟑螂：深夜的自然碎碎念\n\n\n\n随笔\n\n自然观察\n\n漫想\n\n\n\n\n\n\n\n\n\nJul 3, 2026\n\n\nHaoqing Xu\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\ncode\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2026\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 31, 2026\n\n\nTristan O’Malley\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "en/index.html",
-    "href": "en/index.html",
-    "title": "sssssldy",
+    "objectID": "en/about.html",
+    "href": "en/about.html",
+    "title": "About",
     "section": "",
-    "text": "No matching items"
+    "text": "About this blog"
   },
   {
     "objectID": "about.html",
@@ -35,18 +35,11 @@
     "text": "About this blog"
   },
   {
-    "objectID": "en/about.html",
-    "href": "en/about.html",
-    "title": "About",
+    "objectID": "en/index.html",
+    "href": "en/index.html",
+    "title": "sssssldy",
     "section": "",
-    "text": "About this blog"
-  },
-  {
-    "objectID": "gallery/index.html",
-    "href": "gallery/index.html",
-    "title": "野外采样画廊",
-    "section": "",
-    "text": "这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。\n\n\n&lt;div class=\"gallery-main\"&gt;\n    &lt;div class=\"filter-tabs\"&gt;\n        &lt;button class=\"filter-tab active\" onclick=\"filterGallery('all')\"&gt;全部&lt;/button&gt;\n        &lt;button class=\"filter-tab\" onclick=\"filterGallery('2025')\"&gt;2025&lt;/button&gt;\n        &lt;button class=\"filter-tab\" onclick=\"filterGallery('2026')\"&gt;2026&lt;/button&gt;\n    &lt;/div&gt;\n\n    &lt;div class=\"gallery-grid\" id=\"gallery-container\"&gt;\n    &lt;/div&gt;\n&lt;/div&gt;\n\n&lt;div class=\"gallery-sidebar\"&gt;\n    &lt;div class=\"sidebar-section\"&gt;\n        &lt;h4&gt;分类&lt;/h4&gt;\n        &lt;ul&gt;\n            &lt;li&gt;&lt;a href=\"#\" onclick=\"filterGallery('all'); return false;\"&gt;全部 &lt;span class=\"count\"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n            &lt;li&gt;&lt;a href=\"#\" onclick=\"filterGalleryByCategory('水体采样'); return false;\"&gt;水体采样 &lt;span class=\"count\"&gt;1&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n            &lt;li&gt;&lt;a href=\"#\" onclick=\"filterGalleryByCategory('湿地调查'); return false;\"&gt;湿地调查 &lt;span class=\"count\"&gt;1&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n        &lt;/ul&gt;\n    &lt;/div&gt;\n    \n    &lt;div class=\"sidebar-section\"&gt;\n        &lt;h4&gt;年份&lt;/h4&gt;\n        &lt;ul&gt;\n            &lt;li&gt;&lt;a href=\"#\" onclick=\"filterGallery('all'); return false;\"&gt;全部 &lt;span class=\"count\"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n            &lt;li&gt;&lt;a href=\"#\" onclick=\"filterGallery('2025'); return false;\"&gt;2025 &lt;span class=\"count\"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n        &lt;/ul&gt;\n    &lt;/div&gt;\n&lt;/div&gt;"
+    "text": "No matching items"
   },
   {
     "objectID": "posts/2026-07-03-my-essay/index.html",
