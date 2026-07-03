@@ -132,7 +132,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">采样地图</h1>
-<p class="subtitle lead">点击标记点查看采样照片</p>
+<p class="subtitle lead">点击或悬停标记点查看采样照片</p>
 </div>
 
 
@@ -149,21 +149,19 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="采样点位分布" class="level2">
-<h2 class="anchored" data-anchor-id="采样点位分布">采样点位分布</h2>
-<div id="map" style="height: 600px; width: 100%; border-radius: 8px;">
-
+<div class="map-container">
+<div class="map-section">
+<pre><code>&lt;h3 style="margin: 0 0 16px 0; color: #333; font-size: 1.25rem;"&gt;采样点位分布&lt;/h3&gt;
+&lt;div id="map"&gt;&lt;/div&gt;</code></pre>
 </div>
-</section>
-<section id="照片展示" class="level2">
-<h2 class="anchored" data-anchor-id="照片展示">照片展示</h2>
-<div id="photo-gallery" class="gallery-container" style="display: none;">
-<h3 id="gallery-title" class="gallery-title anchored">
-</h3>
-<p id="gallery-description" class="gallery-description">
-</p>
-<div id="photo-grid" class="photo-grid">
-
+<div class="info-section">
+<pre><code>&lt;div id="info-content"&gt;
+  &lt;div class="welcome-message"&gt;
+    &lt;div class="welcome-icon"&gt;🗺️&lt;/div&gt;
+    &lt;h3&gt;选择采样点&lt;/h3&gt;
+    &lt;p&gt;将鼠标悬停或点击地图上的蓝色标记点，查看该地点的采样照片和经历说明&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
 </div>
 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRS9BMY=" crossorigin="">
@@ -171,137 +169,258 @@ ul.task-list li input[type="checkbox"] {
 <script>
 const samplingPoints = [
   {
-    name: "湖泊采样点 A",
-    location: "武汉东湖",
+    name: "武汉东湖",
+    location: "湖北省武汉市",
     latitude: 30.5423,
     longitude: 114.3574,
-    description: "东湖主要湖区采样点，水深约 2.5 米，水质良好",
+    description: "2026年夏季，我们在东湖进行了为期一周的采样工作。东湖作为武汉市最大的城中湖，水质状况对城市生态至关重要。采样期间天气炎热，但团队成员依然坚持完成了20个点位的水样采集，涵盖了东湖的主要湖区和入湖河流。通过对浮游植物群落和理化指标的分析，我们希望能为东湖的生态保护提供科学依据。",
+    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
+  },
+  {
+    name: "梁子湖湿地",
+    location: "湖北省鄂州市",
+    latitude: 30.2423,
+    longitude: 114.6574,
+    description: "梁子湖是湖北省第二大淡水湖，也是国家湿地公园。这里生态环境优美，生物多样性丰富。我们在这里进行了eDNA（环境DNA）采样，这种非侵入式的采样方法可以在不打扰生物的情况下检测物种分布。采样过程中我们还观察到了多种珍稀鸟类和湿地植物。",
+    photos: ["../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
+  },
+  {
+    name: "杭州西湖",
+    location: "浙江省杭州市",
+    latitude: 30.2741,
+    longitude: 120.1551,
+    description: "西湖不仅是著名的风景名胜区，也是城市生态系统的重要组成部分。我们在这里开展了与武汉东湖的对比研究，分析城市景观水体的生态特征差异。西湖的水质管理经验为其他城市湖泊的治理提供了很好的参考。",
     photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg"]
   },
   {
-    name: "湖泊采样点 B",
-    location: "武汉南湖",
-    latitude: 30.5023,
-    longitude: 114.3374,
-    description: "南湖湖心采样点，周边有高校和居民区",
-    photos: ["../gallery/photos/lake_sampling1.jpg"]
-  },
-  {
-    name: "湿地采样点 C",
-    location: "梁子湖湿地",
-    latitude: 30.2423,
-    longitude: 114.6574,
-    description: "梁子湖国家湿地公园，生态保护区域",
+    name: "滇池",
+    location: "云南省昆明市",
+    latitude: 24.8820,
+    longitude: 102.8340,
+    description: "滇池是云南省最大的淡水湖，近年来经历了大规模的生态治理。我们参与了滇池水质监测项目，评估治理效果。采样过程中我们看到了滇池生态环境的显著改善，许多水生植物重新生长，鸟类也逐渐回归。",
     photos: ["../gallery/photos/lake_sampling2.jpg"]
   },
   {
-    name: "湖泊采样点 D",
-    location: "汤逊湖",
-    latitude: 30.4423,
-    longitude: 114.3874,
-    description: "汤逊湖东岸采样点，城市边缘湖泊",
-    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg"]
+    name: "洱海",
+    location: "云南省大理市",
+    latitude: 25.6046,
+    longitude: 100.1868,
+    description: "洱海是高原淡水湖泊的典型代表，水质清澈，风景秀丽。我们在这里进行了高原湖泊特有物种的调查，发现了一些有趣的浮游生物群落特征。洱海的生态保护工作做得非常出色，给我们留下了深刻印象。",
+    photos: ["../gallery/photos/lake_sampling1.jpg", "../gallery/photos/lake_sampling2.jpg", "../gallery/photos/lake_sampling1.jpg"]
   }
 ];
 
-const map = L.map('map').setView([30.45, 114.45], 10);
+const map = L.map('map', {
+  zoomControl: false,
+  scrollWheelZoom: false,
+  doubleClickZoom: false,
+  dragging: false,
+  touchZoom: false
+}).setView([30, 115], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+map.setMaxZoom(4);
+map.setMinZoom(4);
+
 const markerIcon = L.divIcon({
-  className: 'custom-marker',
-  html: '<div style="width: 24px; height: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"></div>',
-  iconSize: [24, 24],
-  iconAnchor: [12, 12]
+  className: 'sampling-marker',
+  html: '<div class="marker-dot"></div>',
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
 });
 
-samplingPoints.forEach(point => {
+samplingPoints.forEach((point, index) => {
   const marker = L.marker([point.latitude, point.longitude], { icon: markerIcon }).addTo(map);
   
-  marker.bindPopup(`
-    <div style="min-width: 200px;">
-      <h4 style="margin: 0 0 8px 0; color: #333;">${point.name}</h4>
-      <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">📍 ${point.location}</p>
-      <p style="margin: 0 0 12px 0; font-size: 13px; color: #888;">${point.description}</p>
-      <button onclick="showPhotos(${samplingPoints.indexOf(point)})" 
-              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
-        查看照片
-      </button>
-    </div>
-  `);
+  marker.on('mouseover', function() {
+    showPointInfo(index);
+  });
+  
+  marker.on('click', function() {
+    showPointInfo(index);
+  });
 });
 
-function showPhotos(index) {
+function showPointInfo(index) {
   const point = samplingPoints[index];
-  const gallery = document.getElementById('photo-gallery');
-  const title = document.getElementById('gallery-title');
-  const description = document.getElementById('gallery-description');
-  const grid = document.getElementById('photo-grid');
-  
-  title.textContent = `${point.name} - ${point.location}`;
-  description.textContent = point.description;
+  const content = document.getElementById('info-content');
   
   let photosHtml = '';
   point.photos.forEach((photo, i) => {
     photosHtml += `
-      <div class="photo-item">
-        <img src="${photo}" alt="采样照片 ${i + 1}" 
-             style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;" />
+      <div class="waterfall-item">
+        <img src="${photo}" alt="${point.name} 照片 ${i + 1}" class="waterfall-img" />
       </div>
     `;
   });
   
-  grid.innerHTML = photosHtml;
-  gallery.style.display = 'block';
-  
-  gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  content.innerHTML = `
+    <div class="point-info">
+      <h2 class="point-name">${point.name}</h2>
+      <p class="point-location">📍 ${point.location}</p>
+      
+      <div class="photos-waterfall">
+        ${photosHtml}
+      </div>
+      
+      <div class="point-description">
+        <h4>采样经历</h4>
+        <p>${point.description}</p>
+      </div>
+    </div>
+  `;
 }
 </script>
 <style>
-.gallery-container {
-  margin-top: 30px;
-  padding: 24px;
-  background: #f8f9fa;
-  border-radius: 12px;
+.map-container {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.gallery-title {
-  margin: 0 0 8px 0;
+.map-section {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+#map {
+  height: 700px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.info-section {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  max-height: 740px;
+  overflow-y: auto;
+}
+
+#info-content {
+  min-height: 100%;
+}
+
+.welcome-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.welcome-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.welcome-message h3 {
+  margin: 0 0 12px 0;
   color: #333;
   font-size: 1.5rem;
 }
 
-.gallery-description {
+.welcome-message p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.point-info {
+  color: #333;
+}
+
+.point-name {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  color: #1a73e8;
+}
+
+.point-location {
   margin: 0 0 20px 0;
-  color: #666;
   font-size: 1rem;
+  color: #666;
 }
 
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+.photos-waterfall {
+  column-count: 2;
+  column-gap: 12px;
+  margin-bottom: 24px;
 }
 
-.photo-item {
+.waterfall-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.custom-marker {
-  transition: transform 0.2s;
+.waterfall-img {
+  width: 100%;
+  display: block;
 }
 
-.custom-marker:hover {
-  transform: scale(1.2);
+.point-description {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.point-description h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.point-description p {
+  margin: 0;
+  line-height: 1.7;
+  color: #555;
+  font-size: 0.95rem;
+  text-align: justify;
+}
+
+.sampling-marker .marker-dot {
+  width: 16px;
+  height: 16px;
+  background: #4285f4;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.5);
+  transition: all 0.3s ease;
+}
+
+.sampling-marker:hover .marker-dot,
+.sampling-marker:active .marker-dot {
+  background: #2a76f6;
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .map-container {
+    flex-direction: column;
+  }
+  
+  #map {
+    height: 500px;
+  }
+  
+  .photos-waterfall {
+    column-count: 1;
+  }
 }
 </style>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

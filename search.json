@@ -14,11 +14,11 @@
     "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
   },
   {
-    "objectID": "map/index.html#照片展示",
-    "href": "map/index.html#照片展示",
+    "objectID": "map/index.html",
+    "href": "map/index.html",
     "title": "采样地图",
-    "section": "照片展示",
-    "text": "照片展示"
+    "section": "",
+    "text": "&lt;h3 style=\"margin: 0 0 16px 0; color: #333; font-size: 1.25rem;\"&gt;采样点位分布&lt;/h3&gt;\n&lt;div id=\"map\"&gt;&lt;/div&gt;\n\n\n&lt;div id=\"info-content\"&gt;\n  &lt;div class=\"welcome-message\"&gt;\n    &lt;div class=\"welcome-icon\"&gt;🗺️&lt;/div&gt;\n    &lt;h3&gt;选择采样点&lt;/h3&gt;\n    &lt;p&gt;将鼠标悬停或点击地图上的蓝色标记点，查看该地点的采样照片和经历说明&lt;/p&gt;\n  &lt;/div&gt;\n&lt;/div&gt;"
   },
   {
     "objectID": "gallery/index.html",
