@@ -1,39 +1,33 @@
-
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的野外采样足迹与随笔</title>
-    <!-- 引入 Leaflet 地图库的样式与脚本 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
-        /* 页面整体布局：左右 1/6 留白 */
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            /* 页面基础UI字体：使用现代、清晰的无衬线系统字体 */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            overflow: hidden; /* 禁止全屏滚动 */
-            background-color: #0c0c0e; /* 网页最外层留白背景（极深优雅黑） */
+            overflow: hidden;
+            background-color: #f8f9fa;
             display: flex;
-            justify-content: center; /* 居中显示核心内容 */
+            justify-content: center;
             align-items: center;
         }
 
-        /* 核心展示区域：左右各空出 1/6 (总宽度占 66.67%) */
         #main-wrapper {
             width: 66.67%;
             height: 100%;
             position: relative;
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.7); /* 为边缘添加微弱投影 */
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
-        /* 背景媒体容器：并排容纳地图与九宫格照片墙 */
         #media-container {
             position: absolute;
             top: 0;
@@ -44,7 +38,6 @@
             z-index: 1;
         }
 
-        /* 左侧地图区域：占 wrapper 的 50% 宽度 */
         #map-container {
             width: 50%;
             height: 100%;
@@ -55,107 +48,99 @@
             height: 100%;
         }
 
-        /* 右侧展示区域：占 wrapper 的 50% 宽度，三列九宫格网格 */
         #photo-stream {
             width: 50%;
             height: 100%;
             box-sizing: border-box;
-            padding: 40px 30px 45vh 30px; /* 底部留出足够空间，防止图片被初始浮动卡片遮挡 */
-            background-color: #16161a; /* 深色面板背景 */
-            border-left: 1px solid #2a2a30;
+            padding: 40px 30px 45vh 30px;
+            background-color: #ffffff;
+            border-left: 1px solid #e9ecef;
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 确认为三列九宫格排布 */
-            gap: 12px; /* 照片卡片之间的间距 */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
             grid-auto-rows: max-content;
-            overflow-y: auto; /* 照片墙自身可独立滚动 */
+            overflow-y: auto;
         }
 
-        /* 九宫格单张图片卡片 */
         .photo-card {
             width: 100%;
-            border-radius: 6px; 
+            border-radius: 8px;
             overflow: hidden;
-            background-color: #1a1a1f; /* 卡片背景色 */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
+            border: 1px solid #e9ecef;
         }
         
         .photo-card:hover {
-            transform: scale(1.04); /* 悬停时轻微放大 */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            transform: scale(1.04);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
 
-        /* 卡片中的图片样式：完美正方形裁剪 */
         .photo-card img {
             display: block;
             width: 100%;
-            aspect-ratio: 1 / 1; /* 核心：强制正方形比例 */
-            object-fit: cover; /* 核心：不拉伸不变形，按中心自动裁剪填满 */
-            filter: brightness(0.9);
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
             transition: filter 0.3s ease;
-            cursor: pointer; /* 悬停时手势提示 */
+            cursor: pointer;
         }
 
         .photo-card:hover img {
-            filter: brightness(1.05); /* 悬停时图片微微变亮 */
+            filter: brightness(1.02);
         }
 
-        /* 照片下方的精致标题框 */
         .photo-caption {
             padding: 8px 5px;
-            color: #aaaaaa; /* 降低亮度，减少视觉干扰 */
-            font-size: 0.72rem; /* 适当缩小字体以适应三列小格 */
+            color: #6c757d;
+            font-size: 0.72rem;
             text-align: center;
             font-weight: 400;
-            letter-spacing: 1px; /* 字母间距拉开，更具设计感 */
-            background-color: #111114; /* 稍微深一些的底部标题栏 */
-            border-top: 1px solid #25252b;
+            letter-spacing: 1px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* 文字超长时显示省略号 */
+            text-overflow: ellipsis;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        /* 全局滚动文本层：浮动在媒体层之上 */
         #text-overlay-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            overflow-y: auto; /* 允许此处进行整站纵向滚动 */
+            overflow-y: auto;
             z-index: 2;
-            pointer-events: none; /* 关键：点击穿透，使上方 2/3 的地图和照片依然可以被交互 */
+            pointer-events: none;
         }
 
-        /* 顶部占位器：占屏幕高度的 2/3 (即从底部 1/3 开始显示文字) */
         #text-overlay-container .spacer {
             height: 66.67vh;
             pointer-events: none;
         }
 
-        /* 悬浮文字内容卡片 */
         #site-text-card {
-            pointer-events: auto; /* 恢复卡片区域的鼠标交互 */
-            background: linear-gradient(to bottom, rgba(22, 22, 26, 0.92) 0%, rgba(22, 22, 26, 0.99) 150px, #16161a 100%);
-            backdrop-filter: blur(15px); /* 强化现代毛玻璃半透明效果 */
+            pointer-events: auto;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.99) 150px, #ffffff 100%);
+            backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(255, 255, 255, 0.08); /* 精致的分界线 */
-            padding: 45px 55px 65px 55px; /* 增加内边距，让排版更加呼吸透气 */
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 45px 55px 65px 55px;
             box-sizing: border-box;
-            min-height: 33.33vh; /* 保证至少填满下方的 1/3 屏幕 */
-            box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.6); /* 向上投射的柔和阴影 */
+            min-height: 33.33vh;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
         }
 
-        /* 标题部分：现代、干净、具有仪式感 */
         #site-title {
             margin: 0 0 25px 0;
-            color: #ffffff;
+            color: #212529;
             font-size: 1.65rem;
-            font-weight: 500;
-            letter-spacing: 2px; /* 宽字间距，展现画廊标题感 */
+            font-weight: 600;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
@@ -166,48 +151,43 @@
             display: inline-block;
             width: 3px;
             height: 1.2rem;
-            background-color: #00d2ff;
+            background-color: #007bff;
             margin-right: 12px;
             border-radius: 1px;
         }
 
-        /* 随笔正文文本容器：使用古典高雅的衬线书宋体 */
         #site-text {
-            /* 依次适配：苹果系统的宋体、Windows系统的中易宋体、思源宋体，最后降级到标准衬线体 */
             font-family: "Georgia", "Nimbus Roman No9 L", "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
-            color: #e2e2e5; /* 微微调亮字体颜色，确保在深色毛玻璃背景上有极佳的对比度与可读性 */
-            font-size: 1.05rem; /* 适当微调中文字体大小，让宋体细节更清晰 */
-            text-align: justify; /* 左右两端对齐 */
+            color: #495057;
+            font-size: 1.05rem;
+            text-align: justify;
         }
 
-        /* 段落美化 */
         #site-text p {
-            line-height: 2.0; /* 增加到 2.0 倍行高，给予诗意段落更充足的呼吸空间 */
-            margin: 0 0 22px 0; /* 略微拉大段间距 */
-            text-indent: 2em;    /* 首行缩进两个中文字符 */
-            letter-spacing: 0.06em; /* 汉字字间距轻微拉开，营造出铅字印刷般的透气美感 */
+            line-height: 2.0;
+            margin: 0 0 22px 0;
+            text-indent: 2em;
+            letter-spacing: 0.06em;
         }
 
         #site-text p:last-child {
             margin-bottom: 0;
         }
 
-        /* 滚动条美化 */
         #photo-stream::-webkit-scrollbar,
         #text-overlay-container::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
         #photo-stream::-webkit-scrollbar-thumb,
         #text-overlay-container::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.12);
-            border-radius: 2px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
         }
         #photo-stream::-webkit-scrollbar-track,
         #text-overlay-container::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        /* 全屏图片灯箱 (Lightbox) */
         #lightbox {
             display: none;
             position: fixed;
@@ -216,7 +196,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(10, 10, 12, 0.95);
+            background-color: rgba(255, 255, 255, 0.95);
             justify-content: center;
             align-items: center;
             cursor: zoom-out;
@@ -230,8 +210,8 @@
         #lightbox img {
             max-width: 85%;
             max-height: 85%;
-            border-radius: 6px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
@@ -242,62 +222,52 @@
             position: absolute;
             top: 30px;
             right: 40px;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(0, 0, 0, 0.4);
             font-size: 36px;
             font-weight: 300;
             cursor: pointer;
             transition: color 0.2s;
         }
         #lightbox .close-btn:hover {
-            color: #ffffff;
+            color: #212529;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1/6 居中包裹容器 -->
     <div id="main-wrapper">
-        <!-- 底层背景：地图 + 照片 -->
         <div id="media-container">
-            <!-- 左侧地图 -->
             <div id="map-container">
                 <div id="map"></div>
             </div>
 
-            <!-- 右侧三列九宫格网格 -->
             <div id="photo-stream">
-                <!-- 图片卡片由 JavaScript 动态载入 -->
             </div>
         </div>
 
-        <!-- 表层浮动滚动文字层 -->
         <div id="text-overlay-container">
-            <!-- 占位器，留出顶部 2/3 -->
             <div class="spacer"></div>
-            <!-- 文字内容卡片 -->
             <div id="site-text-card">
                 <h3 id="site-title">采样站点信息</h3>
                 <div id="site-text">
-                    <p>请将鼠标悬停在左侧地图上的亮蓝色标志点，查看该地点的采样故事与现场风光。</p>
+                    <p>请将鼠标悬停在左侧地图上的蓝色标志点，查看该地点的采样故事与现场风光。</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 现场照片大图放大灯箱结构 -->
     <div id="lightbox" onclick="closeLightbox()">
         <span class="close-btn">&times;</span>
         <img id="lightbox-img" src="" alt="放大预览" onclick="event.stopPropagation();" />
     </div>
 
     <script>
-        // 1. 数据配置：陕西潼关湿地（包含每张现场图片的专属标题）
         const sampleData = [
             {
                 id: 1,
                 name: "陕西潼关湿地",
-                lat: 34.615,   // 潼关黄河湿地真实纬度
-                lng: 110.263,  // 潼关黄河湿地真实经度
+                lat: 34.615,
+                lng: 110.263,
                 text: `在夏天，北方的大晴天让人很吃不消。但是夜晚就很柔和了。今天我们班在傍晚集体到黄河边坐快艇，河风吹乱了大家的头发。
 
 远山淡青色。水是黄浊的，不湍急，倒是很缓和，推扫着零散着烟头的土滩。我似乎是第一次见褶皱如此细密的水面，像是布满了银色黑色的发晶。
@@ -318,32 +288,28 @@
             }
         ];
 
-        // 2. 初始化地图并微调中心
         const map = L.map('map', {
-            zoomControl: false,       // 隐藏默认的放大缩小按钮
-            scrollWheelZoom: false,  // 禁止滚轮缩放
-            doubleClickZoom: false,  // 禁止双击放大
-            boxZoom: false,          // 禁止框选放大
-            dragPan: false,          // 完全锁死拖拽
-            touchZoom: false         // 禁止手机端双指缩放
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            dragPan: false,
+            touchZoom: false
         }).setView([34.0, 108.0], 3);
 
-        // 3. 载入高质量极简暗色底图
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // 4. 定义亮蓝色闪耀圆圈样式
         const markerOptions = {
             radius: 8,
-            fillColor: "#00d2ff", // 电光亮蓝
-            color: "#ffffff",     // 白色边缘
+            fillColor: "#007bff",
+            color: "#ffffff",
             weight: 2,
             opacity: 1,
             fillOpacity: 0.95
         };
 
-        // 5. 灯箱开启与关闭逻辑
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
 
@@ -356,21 +322,16 @@
             lightbox.classList.remove('active');
         }
 
-        // 监听 ESC 键关闭灯箱
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();
         });
 
-        // 6. 更新展示界面的函数
         function updateRightPanel(data) {
-            // 写入地名
             document.getElementById('site-title').innerText = data.name;
             
-            // 写入多分段故事
             const textContainer = document.getElementById('site-text');
-            textContainer.innerHTML = ''; // 清空原有内容
+            textContainer.innerHTML = '';
             
-            // 按照换行符切割文本，并过滤掉多余的空行
             const paragraphs = data.text.split('\n');
             paragraphs.forEach(pText => {
                 const trimmedText = pText.trim();
@@ -381,65 +342,52 @@
                 }
             });
 
-            // 载入图片流（三列九宫格网格，强制正方形）
             const stream = document.getElementById('photo-stream');
-            stream.innerHTML = ''; 
+            stream.innerHTML = '';
             data.images.forEach(imgData => {
-                // 创建一个包裹卡片容器
                 const card = document.createElement('div');
                 card.className = 'photo-card';
 
-                // 创建图片
                 const img = document.createElement('img');
                 img.src = imgData.url;
                 img.alt = imgData.title;
                 
-                // 绑定图片点击查看大图事件
                 img.addEventListener('click', () => openLightbox(imgData.url));
 
-                // 处理加载失败
                 img.onerror = () => {
                     card.style.display = 'none';
-                    console.log(`未找到图片: ${imgData.url}，请确认其放在了 smpling 文件夹内并且文件名正确。`);
+                    console.log(`未找到图片: ${imgData.url}`);
                 };
 
-                // 创建标题框
                 const caption = document.createElement('div');
                 caption.className = 'photo-caption';
                 caption.innerText = imgData.title;
 
-                // 装配卡片并添加到网格中
                 card.appendChild(img);
                 card.appendChild(caption);
                 stream.appendChild(card);
             });
 
-            // 切换点位时，自动将文字滚动条平滑重置回顶部
             document.getElementById('text-overlay-container').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 7. 渲染坐标点
         sampleData.forEach(site => {
             const marker = L.circleMarker([site.lat, site.lng], markerOptions).addTo(map);
 
-            // 鼠标悬停事件
             marker.on('mouseover', function () {
-                this.setStyle({ fillColor: '#ffffff', radius: 10 }); // 悬停时高亮放大成白色
+                this.setStyle({ fillColor: '#0056b3', radius: 10 });
                 updateRightPanel(site);
             });
 
-            // 鼠标移出事件
             marker.on('mouseout', function () {
-                this.setStyle(markerOptions); // 恢复原状
+                this.setStyle(markerOptions);
             });
 
-            // 鼠标点击事件（兼顾触屏设备）
             marker.on('click', function () {
                 updateRightPanel(site);
             });
         });
 
-        // 8. 页面首次加载时，默认自动展示第一个采样点（潼关湿地）的内容
         if (sampleData.length > 0) {
             updateRightPanel(sampleData[0]);
         }
