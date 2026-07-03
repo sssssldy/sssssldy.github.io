@@ -151,6 +151,20 @@ ul.task-list li input[type="checkbox"] {
 
 <p>这里记录了我们在野外进行水体采样、湿地调查以及环境 DNA 过滤的工作瞬间与风景。</p>
 <style>
+    .gallery-container {
+        display: flex;
+        gap: 30px;
+    }
+    
+    .gallery-main {
+        flex: 1;
+    }
+    
+    .gallery-sidebar {
+        width: 250px;
+        flex-shrink: 0;
+    }
+    
     .filter-tabs {
         display: flex;
         gap: 12px;
@@ -183,7 +197,7 @@ ul.task-list li input[type="checkbox"] {
     
     .gallery-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
     }
     
@@ -234,7 +248,76 @@ ul.task-list li input[type="checkbox"] {
         margin-bottom: 8px;
     }
     
-    @media (max-width: 768px) {
+    .gallery-item .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 8px;
+    }
+    
+    .gallery-item .tag {
+        padding: 2px 8px;
+        border-radius: 4px;
+        background-color: #e3f2fd;
+        color: #1976d2;
+        font-size: 0.7rem;
+    }
+    
+    .sidebar-section {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-section h4 {
+        margin: 0 0 16px 0;
+        font-size: 1rem;
+        color: #212529;
+        font-weight: 600;
+    }
+    
+    .sidebar-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sidebar-section li {
+        margin-bottom: 8px;
+    }
+    
+    .sidebar-section li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .sidebar-section a {
+        color: #495057;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+    }
+    
+    .sidebar-section a:hover {
+        color: #007bff;
+    }
+    
+    .sidebar-section .count {
+        float: right;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    @media (max-width: 992px) {
+        .gallery-container {
+            flex-direction: column;
+        }
+        
+        .gallery-sidebar {
+            width: 100%;
+        }
+        
         .gallery-grid {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -246,13 +329,36 @@ ul.task-list li input[type="checkbox"] {
         }
     }
 </style>
-<div class="filter-tabs">
-<pre><code>&lt;button class="filter-tab active" onclick="filterGallery('all')"&gt;全部&lt;/button&gt;
-&lt;button class="filter-tab" onclick="filterGallery('2025')"&gt;2025&lt;/button&gt;
-&lt;button class="filter-tab" onclick="filterGallery('2026')"&gt;2026&lt;/button&gt;</code></pre>
-</div>
-<div id="gallery-container" class="gallery-grid">
+<div class="gallery-container">
+<pre><code>&lt;div class="gallery-main"&gt;
+    &lt;div class="filter-tabs"&gt;
+        &lt;button class="filter-tab active" onclick="filterGallery('all')"&gt;全部&lt;/button&gt;
+        &lt;button class="filter-tab" onclick="filterGallery('2025')"&gt;2025&lt;/button&gt;
+        &lt;button class="filter-tab" onclick="filterGallery('2026')"&gt;2026&lt;/button&gt;
+    &lt;/div&gt;
 
+    &lt;div class="gallery-grid" id="gallery-container"&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="gallery-sidebar"&gt;
+    &lt;div class="sidebar-section"&gt;
+        &lt;h4&gt;分类&lt;/h4&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href="#" onclick="filterGallery('all'); return false;"&gt;全部 &lt;span class="count"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" onclick="filterGalleryByCategory('水体采样'); return false;"&gt;水体采样 &lt;span class="count"&gt;1&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" onclick="filterGalleryByCategory('湿地调查'); return false;"&gt;湿地调查 &lt;span class="count"&gt;1&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="sidebar-section"&gt;
+        &lt;h4&gt;年份&lt;/h4&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href="#" onclick="filterGallery('all'); return false;"&gt;全部 &lt;span class="count"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" onclick="filterGallery('2025'); return false;"&gt;2025 &lt;span class="count"&gt;2&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
 </div>
 <script>
     const galleryItems = [
@@ -260,55 +366,17 @@ ul.task-list li input[type="checkbox"] {
             title: "湖泊水体采样",
             description: "现场采集水样，用于后续浮游植物群落分析与理化指标测定。",
             image: "photos/lake_sampling1.jpg",
-            year: "2025"
+            year: "2025",
+            category: "水体采样",
+            tags: ["湖泊", "浮游植物", "理化指标"]
         },
         {
             title: "湿地野外观测",
             description: "wetland 采样点的生态景观与水样环境 DNA (eDNA) 现场过滤。",
             image: "photos/lake_sampling2.jpg",
-            year: "2025"
-        },
-        {
-            title: "黄河滩涂采样",
-            description: "陕西潼关湿地黄河滩涂区域的样本采集工作。",
-            image: "../map/smpling/TG1.jpg",
-            year: "2026"
-        },
-        {
-            title: "远山风机观测",
-            description: "观测区域内风力发电机与周边生态环境。",
-            image: "../map/smpling/TG2.jpg",
-            year: "2026"
-        },
-        {
-            title: "黄河滩涂沙洲",
-            description: "黄河岸边的沙洲地貌特征。",
-            image: "../map/smpling/TG3.jpg",
-            year: "2026"
-        },
-        {
-            title: "停泊码头一隅",
-            description: "采样停靠码头的风景。",
-            image: "../map/smpling/TG4.jpg",
-            year: "2026"
-        },
-        {
-            title: "沿岸防护林区",
-            description: "湿地周边的防护林带生态调查。",
-            image: "../map/smpling/TG5.jpg",
-            year: "2026"
-        },
-        {
-            title: "铁道大桥采样",
-            description: "铁路大桥周边区域的样本采集。",
-            image: "../map/smpling/TG6.jpg",
-            year: "2026"
-        },
-        {
-            title: "生境镜中世界",
-            description: "湿地生境的水中倒影。",
-            image: "../map/smpling/TG7.jpg",
-            year: "2026"
+            year: "2025",
+            category: "湿地调查",
+            tags: ["湿地", "eDNA", "生态景观"]
         }
     ];
 
@@ -320,6 +388,9 @@ ul.task-list li input[type="checkbox"] {
             const card = document.createElement('div');
             card.className = 'gallery-item';
             card.dataset.year = item.year;
+            card.dataset.category = item.category;
+            
+            const tagsHtml = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
             
             card.innerHTML = `
                 <img src="${item.image}" alt="${item.title}" />
@@ -327,6 +398,7 @@ ul.task-list li input[type="checkbox"] {
                     <span class="year-badge">${item.year}</span>
                     <h3>${item.title}</h3>
                     <p>${item.description}</p>
+                    <div class="tags">${tagsHtml}</div>
                 </div>
             `;
             
@@ -347,6 +419,14 @@ ul.task-list li input[type="checkbox"] {
         const filteredItems = year === 'all' 
             ? galleryItems 
             : galleryItems.filter(item => item.year === year);
+        
+        renderGallery(filteredItems);
+    }
+
+    function filterGalleryByCategory(category) {
+        const filteredItems = category === 'all' 
+            ? galleryItems 
+            : galleryItems.filter(item => item.category === category);
         
         renderGallery(filteredItems);
     }
